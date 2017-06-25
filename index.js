@@ -1,7 +1,8 @@
 var Telebot = require('telebot');
-var BUTTONS = require('./buttons');
-const info = require('./info');
-
+var BUTTONS = require('./dict/buttons');
+var info = require('./dict/info');
+// var replies = require('./replies')(BUTTONS);
+var commands = require('./commands');
 
 var bot = new Telebot({
     token: info.telegram_token,
@@ -13,34 +14,9 @@ var bot = new Telebot({
     }
 });
 
-bot.on('/hide', function(msg) {
-    bot.sendMessage(msg.from.id, "OK", {replyMarkup: 'hide'});
-});
-
-var replyMarkup = bot.keyboard([
-    [BUTTONS.hello.label, BUTTONS.world.label],
-    [BUTTONS.hide.label]
-], {resize: true});
-
-bot.on('/start', function(msg) {
-    // msg.reply.text(msg.text);
-    console.log("HE SENT: " + msg.text);
-
-    bot.getChatMember(info.my_channel_id, msg.from.id).then(function(member) {
-        if(member.result.status == 'left') { //if he wasn't a member of channel
-            console.log("Not Member");
-            bot.sendMessage(msg.from.id, "You are not a member of this channel: https://t.me/nodetest", {replyMarkup: 'hide'});
-        } else {
-            console.log("Success");
-
-            return bot.sendMessage(msg.from.id, "Welcome to the channel", {replyMarkup});
-        }
-        // console.log(q);
-    }).catch(function(member) {
-        console.log("Failure");
-        // console.log(q);
-    })
-});
+// commands.HIDE(bot);
+// commands.START(bot, info);
+commands(bot);
 
 bot.start();
 
