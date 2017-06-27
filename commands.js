@@ -2,6 +2,9 @@ var BUTTONS = require('./dict/buttons');
 var info = require('./dict/info');
 var replies = require('./dict/replies')(BUTTONS);
 var messages = require('./dict/messages');
+var request = require('request');
+var fs = require('fs');
+var Type = require('./schema/type');
 
 module.exports = function(bot) {
 
@@ -39,7 +42,38 @@ module.exports = function(bot) {
 
     bot.on(BUTTONS.male_collection.command, function(msg) {
 
+        getMaleCollection(msg);
+
+
+
+
+
+        // bot.getFile()
+        // console.log(msg);
+        bot.sendMessage(msg.from.id,
+            "TEST", {replyMarkup:
+            bot.keyboard(replies.male_collection, {resize: true})});
     });
+
+    function getMaleCollection(msg) {
+        return new Promise(function(resolve, reject) {
+            Type.find({'gender': 'male'}).exec(function(err, types) {
+                var prefix = "male_type";
+                for(var i = 0; i < types.length; i++) {
+                    BUTTONS[prefix + i] = {
+                        label: types[i].type_name,
+                        command: "/male_" + types[i].type_name
+                    };
+                }
+
+                console.log("BUTTONS:");
+                console.log(BUTTONS);
+                resolve();
+            });
+        }).then(function(resolve, reject) {
+
+        })
+    }
 
     bot.on(BUTTONS.female_collection.command, function(msg) {
 

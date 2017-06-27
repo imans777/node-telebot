@@ -10,7 +10,12 @@
   "author": "Iman Sahebi",
   "license": "ISC",
   "dependencies": {
+    "async": "^2.5.0",
+    "fs": "0.0.1-security",
+    "moment": "^2.18.1",
+    "mongoose": "^4.11.0",
     "node-telegram-bot-api": "^0.27.1",
+    "request": "^2.81.0",
     "telebot": "^1.2.2"
   }
 }

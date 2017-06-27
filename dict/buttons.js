@@ -1,8 +1,6 @@
+var Type = require('../schema/type');
 
-
-
-
-const BUTTONS = {
+var BUTTONS = {
     //------------------------------------ THIS IS JUST FOR TEST
     hello: {
         label: '👋 Hello',
@@ -51,6 +49,40 @@ const BUTTONS = {
         command: '/time_reservation'
     }
 };
+
+
+
+
+
+// var foo, callback;
+// async.function(function(response) {
+//     foo = "bar"
+//     if (exists){
+//         foo = "foobar";
+//     }
+//
+//     if( typeof callback == 'function' ){
+//         callback(foo);
+//     }
+// });
+//
+// module.exports = function(cb){
+//     if(typeof foo != 'undefined'){
+//         cb(foo); // If foo is already define, I don't wait.
+//     } else {
+//         callback = cb;
+//     }
+// };
+//
+//
+// // In main
+// var fooMod = require('./foo.js');
+// fooMod(function(foo){
+//     //Here code using foo;
+// });
+
+
+
 
 module.exports = BUTTONS;
 

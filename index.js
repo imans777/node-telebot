@@ -1,8 +1,14 @@
+var mongoose = require('mongoose');
+mongoose.connect('localhost:27017/telegramdb');
+mongoose.Promise = global.Promise;
+
 var Telebot = require('telebot');
 var BUTTONS = require('./dict/buttons');
 var info = require('./dict/info');
 // var replies = require('./replies')(BUTTONS);
 var commands = require('./commands');
+var commands_admin = require('./commands_admin');
+
 
 var bot = new Telebot({
     token: info.telegram_token,
@@ -14,10 +20,18 @@ var bot = new Telebot({
     }
 });
 
+//FOR ADMIN CONTROL PANNEL BOT
+var newbot = new Telebot(info.telegram_token);
+// newbot.on('text', function(msg) {
+//     msg.reply.text(msg.text);
+//     console.log("Here");
+// });
+commands_admin(newbot);
+newbot.start();
+
 // commands.HIDE(bot);
 // commands.START(bot, info);
 commands(bot);
-
 bot.start();
 
 
