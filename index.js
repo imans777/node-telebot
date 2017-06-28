@@ -21,13 +21,13 @@ var bot = new Telebot({
 });
 
 //FOR ADMIN CONTROL PANNEL BOT
-var newbot = new Telebot(info.telegram_token);
+// var newbot = new Telebot(info.telegram_token);
 // newbot.on('text', function(msg) {
 //     msg.reply.text(msg.text);
 //     console.log("Here");
 // });
-commands_admin(newbot);
-newbot.start();
+// commands_admin(newbot);
+// newbot.start();
 
 // commands.HIDE(bot);
 // commands.START(bot, info);
