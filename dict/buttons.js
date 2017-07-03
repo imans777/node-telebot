@@ -19,14 +19,18 @@ var BUTTONS = {
         label: 'عضو شدم',
         command: '/became_member'
     },
+    main_menu: {
+        label: 'بازگشت به منو',
+        command: '/main_menu'
+    },
     //------------------------------------ THIS IS THE MAIN PART
     male_collection: {
         label: 'کلکسیون آقایان',
         command: '/male_collection'
     },
-    female_collection: {
+    femele_collection: {
         label: 'کلکسیون بانوان',
-        command: '/female_collection'
+        command: '/femele_collection'
     },
     accessory: {
         label: 'Accessory',
@@ -47,7 +51,34 @@ var BUTTONS = {
     time_reservation: {
         label: 'تعیین وقت',
         command: '/time_reservation'
-    }
+    },
+
+
+    //------------------------------------ THIS IS FOR PREVIOUS AND NEXTS
+    previous: {
+        label: 'm_قبلی',
+        command: ''
+    },
+    next: {
+        label: 'm_بعدی',
+        command: ''
+    },
+    return_back: {
+        label: 'بازگشت',
+        command: ''
+    },
+
+    //------------------------------------ THIS IS FOR ACCESSORY
+    accessory_ring: {
+        label: 'انگشتر',
+        command: '/accessory_ring'
+    },
+
+    accessory_hat: {
+        label: 'کلاه',
+        command: '/accessory_hat'
+    },
+
 };
 
 

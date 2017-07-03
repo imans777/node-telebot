@@ -5,21 +5,25 @@ mongoose.connect('localhost:27017/telegramdb');
 
 
 var types = [
+    // new Type({
+    //     gender: 'male',
+    //     type_name: 'فشن'
+    // }),
+    // new Type({
+    //     gender: 'male',
+    //     type_name: 'کلاسیک'
+    // }),
+    // new Type({
+    //     gender: 'male',
+    //     type_name: 'مدل دار'
+    // }),
     new Type({
-        gender: 'male',
-        type_name: 'فشن'
-    }),
-    new Type({
-        gender: 'male',
-        type_name: 'کلاسیک'
-    }),
-    new Type({
-        gender: 'male',
-        type_name: 'مدل دار'
-    }),
-    new Type({
-        gender: 'female',
+        gender: 'femele',
         type_name: 'تابستانه'
+    }),
+    new Type({
+        gender: 'femele',
+        type_name: 'زمستانه'
     })
 ];
 
