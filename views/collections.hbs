@@ -1,0 +1,94 @@
+<div class="row">
+    <div class="col-md-12 col-sm-12">
+        <div class="container">
+            <h1 class="bg-warning title-page">کالکشن‌ها</h1>
+        </div>
+    </div>
+</div>
+<!--div class="thumbnail">
+            <h3 class="caption">{{this.title}}</h3>
+            <img src="{{this.imagePath}}" alt="..." class="img-responsive" id="general_img">
+            <div class="caption">
+
+                <p class="description">{{this.descriptionBrief}}...</p>
+                <div>
+                    <div class="clearfix">
+                        <br>
+                        <div class="pull-left">&nbsp;Author: <a href="/user/profile/{{this.owner.userID}}">{{this.owner.username}}</a></div>
+                        <div class="pull-right">{{this.dateFromNow}}</div>
+                        <br>
+                        <a href="/product/{{this._id}}" class="btn btn-default pull-left btn-primary" role="button">Details ...</a>
+                        <a href="/add-to-cart/{{this._id}}" class="btn btn-default pull-right btn-success" role="button">Add To Cart</a>
+                        <div class="price pull-right pro-label">${{this.price}}&nbsp;&nbsp;&nbsp;</div>
+                    </div>
+                </div>
+            </div>
+        </div-->
+<div class="row">
+    <div class="col-md-6 col-sm-6">
+        <a href="{{col.male.command}}">
+            <button type="button" class="btn btn-info btn-lg btn-block custom-button-width navbar-left collection-btn">
+                {{col.male.label}}
+            </button>
+        </a>
+    </div>
+    <div class="col-md-6 col-sm-6">
+        <!-- FELEME DOESN'T HAVE TYPES -> SHOULD BE DIRECTED DIRECTLY (:D) TO THE GENERAL TYPE WHICH WILL BE CREATEAD LATER -->
+        <a href="{{col.femele.command}}">
+            <button type="button" class="btn btn-info btn-lg btn-block custom-button-width navbar-right collection-btn">
+                {{col.femele.label}}
+            </button>
+        </a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6 col-sm-6">
+        <a href="{{col.spouse.command}}">
+            <button type="button" class="btn btn-info btn-lg btn-block custom-button-width navbar-left collection-btn">
+                {{col.spouse.label}}
+            </button>
+        </a>
+    </div>
+    <div class="col-md-6 col-sm-6">
+        <!-- FELEME DOESN'T HAVE TYPES -> SHOULD BE DIRECTED DIRECTLY (:D) TO THE GENERAL TYPE WHICH WILL BE CREATEAD LATER -->
+        <a href="{{col.baby.command}}">
+            <button type="button" class="btn btn-info btn-lg btn-block custom-button-width navbar-right collection-btn">
+                {{col.baby.label}}
+            </button>
+        </a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6 col-sm-6">
+        <a href="{{col.narriage.command}}">
+            <button type="button" class="btn btn-info btn-lg btn-block custom-button-width navbar-left collection-btn">
+                {{col.narriage.label}}
+            </button>
+        </a>
+    </div>
+    <div class="col-md-6 col-sm-6">
+        <!-- FELEME DOESN'T HAVE TYPES -> SHOULD BE DIRECTED DIRECTLY (:D) TO THE GENERAL TYPE WHICH WILL BE CREATEAD LATER -->
+        <a href="{{col.jewelry.command}}">
+            <button type="button" class="btn btn-info btn-lg btn-block custom-button-width navbar-right collection-btn">
+                {{col.jewelry.label}}
+            </button>
+        </a>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-6 col-sm-6">
+        <a href="{{col.kafsh.command}}">
+            <button type="button" class="btn btn-info btn-lg btn-block custom-button-width navbar-left collection-btn">
+                {{col.kafsh.label}}
+            </button>
+        </a>
+    </div>
+    <div class="col-md-6 col-sm-6">
+        <!-- FELEME DOESN'T HAVE TYPES -> SHOULD BE DIRECTED DIRECTLY (:D) TO THE GENERAL TYPE WHICH WILL BE CREATEAD LATER -->
+        <a href="{{col.accessory.command}}">
+            <button type="button" class="btn btn-info btn-lg btn-block custom-button-width navbar-right collection-btn">
+                {{col.accessory.label}}
+            </button>
+        </a>
+    </div>
+</div>

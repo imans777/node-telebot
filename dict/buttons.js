@@ -1,4 +1,5 @@
 var Type = require('../schema/type');
+var info = require('./info');
 
 var BUTTONS = {
     //------------------------------------ THIS IS JUST FOR TEST
@@ -23,14 +24,38 @@ var BUTTONS = {
         label: 'بازگشت به منو',
         command: '/main_menu'
     },
-    //------------------------------------ THIS IS THE MAIN PART
+    //------------------------------------ THIS IS THE MAIN MENU PART
     male_collection: {
-        label: 'کلکسیون آقایان',
+        label: 'کالکشن آقایان',
         command: '/male_collection'
     },
     femele_collection: {
-        label: 'کلکسیون بانوان',
+        label: 'کالکشن بانوان',
         command: '/femele_collection'
+    },
+    spouse_collection: {
+        label: 'کالکشن همسران',
+        command: '/spouse_collection'
+    },
+    baby_collection: {
+        label: 'کالکشن کودکان',
+        command: '/baby_collection'
+    },
+    narriage_collection: {
+        label: 'کالکشن عروسی',
+        command: '/narriage_collection'
+    },
+    jewelry_collection: {
+        label: 'کالکشن جواهرات',
+        command: '/jewelry_collection'
+    },
+    kafsh_collection: {
+        label: 'کالکشن کفش',
+        command: '/kafsh_collection'
+    },
+    accessory_collection: {
+        label: 'کالکشن اکسسوری',
+        command: 'accessory_collection'
     },
     accessory: {
         label: 'Accessory',
@@ -49,23 +74,23 @@ var BUTTONS = {
         command: '/contact_us'
     },
     time_reservation: {
-        label: 'تعیین وقت',
+        label: 'تعیین وقت شوروم',
         command: '/time_reservation'
     },
 
 
-    //------------------------------------ THIS IS FOR PREVIOUS AND NEXTS
+    //------------------------------------ THIS IS FOR PREVIOUS AND NEXTs
     previous: {
         label: 'm_قبلی',
-        command: ''
+        command: '/main_menu'
     },
     next: {
         label: 'm_بعدی',
-        command: ''
+        command: '/main_menu'
     },
     return_back: {
         label: 'بازگشت',
-        command: ''
+        command: '/main_menu'
     },
 
     //------------------------------------ THIS IS FOR ACCESSORY
@@ -79,9 +104,75 @@ var BUTTONS = {
         command: '/accessory_hat'
     },
 
+    //------------------------------------ THIS IS FOR ACCESSORY
+    admin: {
+        add_type: {
+            label: 'افزودن دسته',
+            command: '/add_type'
+        },
+        add_product: {
+            label: 'افزودن محصول',
+            command: '/add_product'
+        },
+        // add_hat: {
+        //     label: 'افزودن کلاه',
+        //     command: '/add_hat'
+        // },
+        add_ring: {
+            label: 'افزودن انگشتر',
+            command: '/add_ring'
+        },
+        check_answers: {
+            label: 'بررسی پاسخها',
+            command: '/check_answers'
+        },
+        male: {
+            label: 'کالکشن آقایان',
+            command: '/male'
+        },
+        femele: {
+            label: 'کالکشن زنانه',
+            command: '/femele'
+        },
+        spouse: {
+            label: 'کالکشن همسران',
+            command: '/spouse'
+        },
+        baby: {
+            label: 'کالکشن کودکان',
+            command: '/baby'
+        },
+        narriage: {
+            label: 'کالکشن عروسی',
+            command: '/narriage'
+        },
+        jewelry: {
+            label: 'کالکشن جواهرات',
+            command: '/jewelry'
+        },
+        kafsh: {
+            label: 'کالکشن کفش',
+            command: '/kafsh'
+        },
+        accessory: {
+            label: 'کالکشن اکسسوری',
+            command: '/accessory'
+        },
+        return_to_main_menu: {
+            label: 'بازگشت به منوی اصلی',
+            command: '/main_menu'
+        },
+    }
 };
 
-
+BUTTONS[info.male_collection_buttons_prefix + 'back'] = BUTTONS[info.femele_collection_buttons_prefix + 'back'] =
+    BUTTONS[info.spouse_collection_buttons_prefix + 'back'] = BUTTONS[info.baby_collection_buttons_prefix + 'back'] =
+    BUTTONS[info.narriage_collection_buttons_prefix + 'back'] = BUTTONS[info.jewelry_collection_buttons_prefix + 'back'] =
+    BUTTONS[info.kafsh_collection_buttons_prefix + 'back'] = BUTTONS[info.accessory_collection_buttons_prefix + 'back'] =
+    {
+    label: info.return_to_main_menu,
+    command: '/main_menu'
+};
 
 
 

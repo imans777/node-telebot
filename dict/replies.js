@@ -24,12 +24,17 @@ module.exports = function(B) {
             [B.hello.label, B.world.label],
             [B.hide.label]
         ],
+        empty: [
+
+        ],
         entrance: [
             [B.became_member.label]
         ],
         main_menu: [
-            [B.male_collection.label, B.femele_collection.label],
-            [B.accessory.label],
+            [B.femele_collection.label, B.male_collection.label],
+            [B.baby_collection.label, B.spouse_collection.label],
+            [B.jewelry_collection.label, B.narriage_collection.label],
+            [B.accessory_collection.label, B.kafsh_collection.label],
             [B.telegram_channel.label, B.instagram_page.label],
             [B.contact_us.label, B.time_reservation.label]
         ],
@@ -42,7 +47,15 @@ module.exports = function(B) {
         accessory: [
             [B.accessory_ring.label, B.accessory_hat.label],
             [B.main_menu.label]
-        ]
+        ],
+
+        admin: {
+            main_menu: [
+                [B.admin.add_type.label, B.admin.add_product.label],
+                // [B.admin.add_hat.label, B.admin.add_ring.label],
+                [B.admin.check_answers.label]
+            ]
+        }
     };
 
     return r;
