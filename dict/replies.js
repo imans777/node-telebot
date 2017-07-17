@@ -38,6 +38,14 @@ module.exports = function(B) {
             [B.telegram_channel.label, B.instagram_page.label],
             [B.contact_us.label, B.time_reservation.label]
         ],
+        instagram_page: [
+            [B.instagram_2.label, B.instagram_1.label],
+            [B.instagram_4.label, B.instagram_3.label],
+            [B.instagram_6.label, B.instagram_5.label],
+            [B.instagram_8.label, B.instagram_7.label],
+            [B.instagram_10.label, B.instagram_9.label],
+            [B.main_menu.label]
+        ],
         male_collection: male_types,
         femele_collection: [
 

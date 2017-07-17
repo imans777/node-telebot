@@ -7,7 +7,7 @@ var BUTTONS = require('./dict/buttons');
 var info = require('./dict/info');
 // var replies = require('./replies')(BUTTONS);
 var commands = require('./commands');
-var commands_admin = require('./commands_admin');
+// var commands_admin = require('./commands_admin');
 
 
 var bot = new Telebot({
@@ -21,18 +21,26 @@ var bot = new Telebot({
 });
 
 //FOR ADMIN CONTROL PANNEL BOT
-// var newbot = new Telebot(info.telegram_token);
+/*var newbot = new Telebot({
+    token: info.telegram_admin_token,
+    usePlugins: ['namedButtons', 'askUser'],
+    pluginConfig: {
+        namedButtons: {
+            buttons: BUTTONS.admin
+        }
+    }
+});*/
 // newbot.on('text', function(msg) {
 //     msg.reply.text(msg.text);
 //     console.log("Here");
 // });
 // commands_admin(newbot);
-// newbot.start();
 
 // commands.HIDE(bot);
 // commands.START(bot, info);
-commands(bot);
+commands(bot/*, newbot*/);
 bot.start();
+// newbot.start();
 
 
 

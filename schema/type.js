@@ -3,7 +3,8 @@ var Schema = mongoose.Schema;
 
 var schema = new Schema({
     gender: String,
-    type_name: String
+    type_name: String,
+    priority: {type: Number, 'default': 1}
 });
 
 module.exports = mongoose.model('Type', schema);

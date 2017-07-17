@@ -78,6 +78,47 @@ var BUTTONS = {
         command: '/time_reservation'
     },
 
+    //------------------------------------ THIS IS FOR INSTAGRAM PAGES
+    instagram_1: {
+        label: 'پیج اصلی کمرون زیگزال (محصولات جدید)',
+        command: '/instagram_1'
+    },
+    instagram_2: {
+        label: 'پیج دوم مجموعه (محصولات گذشته)',
+        command: '/instagram_2'
+    },
+    instagram_3: {
+        label: 'پیج فروش آنلاین (قیمت محصولات)',
+        command: '/instagram_3'
+    },
+    instagram_4: {
+        label: 'پیج بانوان',
+        command: '/instagram_4'
+    },
+    instagram_5: {
+        label: 'پیج کودکان',
+        command: '/instagram_5'
+    },
+    instagram_6: {
+        label: 'پیج جواهرات',
+        command: '/instagram_6'
+    },
+    instagram_7: {
+        label: 'پیج اکسسوری',
+        command: '/instagram_7'
+    },
+    instagram_8: {
+        label: 'پیج کفشها',
+        command: '/instagram_8'
+    },
+    instagram_9: {
+        label: 'پیج ویدیوها',
+        command: '/instagram_9'
+    },
+    instagram_10: {
+        label: 'پیج مدیریت',
+        command: '/instagram_10'
+    },
 
     //------------------------------------ THIS IS FOR PREVIOUS AND NEXTs
     previous: {

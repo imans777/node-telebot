@@ -9,4 +9,8 @@ var schema = new Schema({
     description: String
 });
 
+schema.virtual('botdir').get(function() {
+    return './public' + this.picture.substr(1, this.picture.length - 1);
+});
+
 module.exports = mongoose.model('Product', schema);
