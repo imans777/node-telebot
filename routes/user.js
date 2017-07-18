@@ -156,7 +156,27 @@ var csrfProtection = csrf();
 //     res.redirect('/');
 // });
 
+router.use(csrfProtection);
 
+//TODO: THIS IS THE SIGNUP PART -> THE ADMIN USER/PASS SHOULD BE ADDED VIA THIS WAY - MANUALLY MAY RESULT IN FAILURE
+router.get('/signup', notLoggedIn, function(req, res, next) {
+    var messages = req.flash('error');
+    res.render('user/signup', { csrfToken: req.csrfToken(), messages: messages, hasErrors: messages.length > 0 });
+});
+
+router.post('/signup', notLoggedIn, passport.authenticate('local.signup', {
+    failureRedirect: '/signup',
+    failureFlash: true
+}), function(req, res, next) {
+    User.findOne({'username': req.body.username}, function(err, user) {
+        if(err) {
+            return res.write('Unexpected Error!');
+        }
+        req.session.user = user;
+        req.app.locals.username = user.username;
+        res.redirect('/account');
+    });
+});
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -558,27 +578,7 @@ router.get('/:gender', isLoggedIn, function(req, res, next) {
     });
 });
 
-router.use(csrfProtection);
 
-//TODO: THIS IS THE SIGNUP PART -> THE ADMIN USER/PASS SHOULD BE ADDED VIA THIS WAY - MANUALLY MAY RESULT IN FAILURE
-router.get('/signup', function(req, res, next) {
-    var messages = req.flash('error');
-    res.render('user/signup', { csrfToken: req.csrfToken(), messages: messages, hasErrors: messages.length > 0 });
-});
-
-router.post('/signup', passport.authenticate('local.signup', {
-    failureRedirect: '/signup',
-    failureFlash: true
-}), function(req, res, next) {
-    User.findOne({'username': req.body.username}, function(err, user) {
-        if(err) {
-            return res.write('Unexpected Error!');
-        }
-        req.session.user = user;
-        req.app.locals.username = user.username;
-        res.redirect('/account');
-    });
-});
 
 router.use('/', notLoggedIn, function(req, res, next) {
     next();
