@@ -49,7 +49,7 @@
     <div class="col-md-4 col-md-offset-4">
         <form action="/{{gender}}/{{type}}/add" method="post" enctype="multipart/form-data">
             <div class="form-group">
-                <input type="file" name="filetoupload" class="form-control" required><br>
+                <input type="file" name="filetoupload" multiple="multiple" accept="image/*" class="form-control" required><br>
             </div>
             <div class="form-group">
                 <input type="text" id="description" name="description" class="form-control" placeholder="توضیحات" required style="direction: rtl;">

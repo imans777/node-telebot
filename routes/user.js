@@ -4,6 +4,7 @@ var csrf = require('csurf');
 var passport = require('passport');
 var formidable = require('formidable');
 var fs = require('fs');
+var async = require('async');
 
 // var Cart = require('../models/cart');
 // var Order = require('../models/order');
@@ -214,7 +215,9 @@ router.post('/:gender/:type/:number/delete', isLoggedIn, function (req, res, nex
         // var wanted_file_number = get_number_path(wanted_doc.picture);
 
         fs.unlink(wanted_doc.botdir, function(errul) {
-            if(errul) throw errul;
+            if(errul) {//throw errul;
+                console.log("file wasn't found");
+            }
 
             Product.find({gender: req.params.gender, type: req.params.type}).sort({number: 'asc'}).exec(function(errr, docs) {
                 if(errr) throw errr;
@@ -389,70 +392,97 @@ router.post('/:gender/:type/:number/next', isLoggedIn, function (req, res, next)
 
 router.post('/:gender/:type/add', isLoggedIn, function (req, res, next) {
     var form = new formidable.IncomingForm();
+    form.multiples = true;
     form.parse(req, function (err, fields, files) {
-        var oldpath = files.filetoupload.path;
+        if(err) throw err;
 
-        var p = './public';
-        if(!fs.existsSync(p))
-            fs.mkdirSync(p);
-        p += '/';
+        // var count = 0;
+        // console.log(files);
+        // console.log("-------");
+        // console.log(files.filetoupload[0].path);
+        // for(var one_file in files.filetoupload) {
+        async.forEachSeries(files.filetoupload, function(one_file, callback) {
+        // })
+        // files.filetoupload.forEachSeries(function(one_file, index) {
+        //     if(files.filetoupload.hasOwnProperty(one_file)) {
+            var p = './public';
+            if(!fs.existsSync(p))
+                fs.mkdirSync(p);
+            p += '/';
 
-        p += 'image';
-        if(!fs.existsSync(p))
-            fs.mkdirSync(p);
-        p += '/';
+            p += 'image';
+            if(!fs.existsSync(p))
+                fs.mkdirSync(p);
+            p += '/';
 
-        p += req.params.gender;
-        if(!fs.existsSync(p))
-            fs.mkdirSync(p);
-        p += '/';
+            p += req.params.gender;
+            if(!fs.existsSync(p))
+                fs.mkdirSync(p);
+            p += '/';
 
-        p += req.params.type;
-        if(!fs.existsSync(p))
-            fs.mkdirSync(p);
-        p += '/';
+            p += req.params.type;
+            if(!fs.existsSync(p))
+                fs.mkdirSync(p);
+            p += '/';
 
-        Product.find({gender: req.params.gender, type: req.params.type}).sort({picture: 'asc'}).exec(function(errf, docs) {
-            if(errf) throw errf;
-            if(docs.length == 0) {
-                p += '1';
-            } else {
-                var highest = get_number_path(docs[0].picture);
-                docs.forEach(function (elem) {
-                    var n = get_number_path(elem.picture);
-                    if (highest < n) {
-                        highest = n;
-                    }
+            var oldpath = one_file.path;
+            Product.find({gender: req.params.gender, type: req.params.type}).sort({picture: 'asc'}).exec(function(errf, docs) {
+                if(errf) throw errf;
+
+                if(docs.length == 0) {
+                    p += '1';
+                } else {
+                    var highest = get_number_path(docs[0].picture);
+                    docs.forEach(function (elem) {
+                        var n = get_number_path(elem.picture);
+                        if (highest < n) {
+                            highest = n;
+                        }
+                    });
+                    p += (highest + 1);
+                }
+                if(one_file.type == 'image/png')
+                    p += '.png';
+                else if(one_file.type == 'image/jpg')
+                    p += '.jpg';
+                else {
+                    console.log("WRONG EXTENSION");
+                    callback();
+                }
+
+                var pro = new Product({
+                    number: (docs.length + 1),
+                    gender: req.params.gender,
+                    type: req.params.type,
+                    picture: get_normal_dir(p),
+                    description: fields.description
                 });
-                p += (highest + 1);
-            }
-            if(files.filetoupload.type == 'image/png')
-                p += '.png';
-            else if(files.filetoupload.type == 'image/jpg')
-                p += '.jpg';
-            else
-                console.log("WRONG EXTENSION");
 
-            var pro = new Product({
-                number: (docs.length + 1),
-                gender: req.params.gender,
-                type: req.params.type,
-                picture: get_normal_dir(p),
-                description: fields.description
-            });
+                pro.save(function(errr) {
+                    if(errr) throw errr;
 
-            pro.save(function(errr) {
-                if(errr) throw errr;
+                    fs.rename(oldpath, p, function (error) {
+                        if (error) throw error;
 
-                fs.rename(oldpath, p, function (error) {
-                    if (error) throw error;
-
-                    res.redirect('/' + req.params.gender + '/' + req.params.type);
+                        // console.log("S3");
+                        // count++;
+                        // if(count == files.length) {
+                        //     res.redirect('/' + req.params.gender + '/' + req.params.type);
+                        // } else {
+                        // console.log("S4: " + count);
+                        callback();
+                        // }
+                    });
                 });
+                // console.log(files.filetoupload);
             });
-            // console.log(files.filetoupload);
+            // p += files.filetoupload.name;
+        // }
+        }, function(erras) {
+            if(erras) throw erras;
+
+            res.redirect('/' + req.params.gender + '/' + req.params.type);
         });
-        // p += files.filetoupload.name;
     });
 });
 
