@@ -156,27 +156,27 @@ var csrfProtection = csrf();
 //     res.redirect('/');
 // });
 
-router.use(csrfProtection);
+
 
 //TODO: THIS IS THE SIGNUP PART -> THE ADMIN USER/PASS SHOULD BE ADDED VIA THIS WAY - MANUALLY MAY RESULT IN FAILURE
-router.get('/signup', notLoggedIn, function(req, res, next) {
-    var messages = req.flash('error');
-    res.render('user/signup', { csrfToken: req.csrfToken(), messages: messages, hasErrors: messages.length > 0 });
-});
-
-router.post('/signup', notLoggedIn, passport.authenticate('local.signup', {
-    failureRedirect: '/signup',
-    failureFlash: true
-}), function(req, res, next) {
-    User.findOne({'username': req.body.username}, function(err, user) {
-        if(err) {
-            return res.write('Unexpected Error!');
-        }
-        req.session.user = user;
-        req.app.locals.username = user.username;
-        res.redirect('/account');
-    });
-});
+// router.get('/signup', notLoggedIn, function(req, res, next) {
+//     var messages = req.flash('error');
+//     res.render('user/signup', { csrfToken: req.csrfToken(), messages: messages, hasErrors: messages.length > 0 });
+// });
+//
+// router.post('/signup', notLoggedIn, passport.authenticate('local.signup', {
+//     failureRedirect: '/signup',
+//     failureFlash: true
+// }), function(req, res, next) {
+//     User.findOne({'username': req.body.username}, function(err, user) {
+//         if(err) {
+//             return res.write('Unexpected Error!');
+//         }
+//         req.session.user = user;
+//         req.app.locals.username = user.username;
+//         res.redirect('/account');
+//     });
+// });
 
 //----------------------------------------------------------------------------------------------------------------------
 
@@ -462,6 +462,56 @@ router.post('/:gender/:type/previous', isLoggedIn, function(req, res, next) {
     });
 });
 
+router.get('/:gender/:type/edit', isLoggedIn, function(req, res, next) {
+    Type.findOne({gender: req.params.gender, type_name: req.params.type}, function(err, doc) {
+        if(err) throw err;
+        if(!doc) {
+            res.redirect('/' + req.params.gender);
+        }
+
+        res.render('type', {
+            gender: req.params.gender,
+            gender_persian: getPersianEquiv(req.params.gender),
+            type: req.params.type
+        });
+    });
+});
+
+router.post('/:gender/:type/edit', isLoggedIn, function(req, res, next) {
+    Type.findOne({gender: req.params.gender, type_name: req.params.type}, function(err, doc) {
+        if(err) throw err;
+        if(!doc) {
+            res.redirect('/' + req.params.gender);
+            return;
+        }
+        doc.type_name = req.body.edited_type_name;
+        doc.save(function(errs) {
+            if(errs) throw errs;
+            Product.find({gender: req.params.gender, type: req.params.type}, function(errp, docs) {
+                if(errp) throw errp;
+                if(docs.length == 0) {
+                    res.redirect('/' + req.params.gender);
+                    return;
+                }
+
+                var my_count = 0;
+                for(var i = 0; i < docs.length; i++) {
+                    // console.log("Stage 7:" + i + "_" + my_count);
+                    docs[i].type = req.body.edited_type_name;
+                    docs[i].save(function(errps) {
+                        if(errps) throw errps;
+                        my_count++;
+                        // console.log("Stage 7_:" + i + "_" + my_count);
+                        if(my_count == docs.length) {
+                            res.redirect('/' + req.params.gender);
+                        }
+                    });
+                }
+            });
+        });
+    });
+});
+
 router.post('/:gender/:type/delete', isLoggedIn, function(req, res, next) {
     Type.findOne({gender: req.params.gender, type_name: req.params.type}).exec(function(err, wanted_doc) {
         if(err) throw err;
@@ -506,8 +556,8 @@ router.post('/:gender/:type/next', isLoggedIn, function(req, res, next) {
 });
 
 router.get('/:gender/:type', isLoggedIn, function (req, res, next) {
-    console.log(req.params.gender);
-    console.log(req.params.type);
+    // console.log(req.params.gender);
+    // console.log(req.params.type);
     Product.find({gender: req.params.gender, type: req.params.type}).sort({number: 'asc'}).exec(function (err, docs) {
         if(err)
             throw err;
@@ -578,7 +628,7 @@ router.get('/:gender', isLoggedIn, function(req, res, next) {
     });
 });
 
-
+router.use(csrfProtection);
 
 router.use('/', notLoggedIn, function(req, res, next) {
     next();

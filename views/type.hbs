@@ -1,0 +1,29 @@
+<div class="row">
+    <div class="col-md-12 col-sm-12">
+        <div class="container">
+            <h1 class="bg-warning title-page">ویرایش دسته</h1>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4 col-md-offset-4">
+        <form action="/{{gender}}/{{type}}/edit" method="post">
+            <div class="form-group">
+                <input type="text" id="edited_type_name" name="edited_type_name" class="form-control" value="{{type}}" required style="direction: rtl;">
+            </div>
+            {{!--<input type="hidden" name="_csrf" value="{{ csrfToken }}">--}}
+            <button type="submit" class="btn btn-primary btn-lg btn-block">تایید ویرایش</button>
+        </form>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12 col-sm-12">
+        <div class="container">
+            <a href="/{{gender}}">
+                <h2 class="bg-warning title-page">
+                    بازگشت به مجموعه {{gender_persian}}
+                </h2>
+            </a>
+        </div>
+    </div>
+</div>

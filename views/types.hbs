@@ -17,17 +17,22 @@
                 <div class="btn-group btn-group-justified">
                     <div class="btn-group">
                         <form action="/{{gender}}/{{this.type_name}}/previous" method="post">
-                            <button type="submit" class="btn btn-primary">انتقال به عقب</button>
+                            <button type="submit" class="btn btn-primary"><span class="fa fa-chevron-circle-left fa-2x"></span></button>
+                        </form>
+                    </div>
+                    <div class="btn-group">
+                        <form action="/{{gender}}/{{this.type_name}}/edit" method="get">
+                            <button type="submit" class="btn btn-info"><span class="fa fa-pencil-square-o fa-2x"></span></button>
                         </form>
                     </div>
                     <div class="btn-group">
                         <form action="/{{gender}}/{{this.type_name}}/delete" method="post">
-                            <button type="submit" class="btn btn-danger">حذف دسته</button>
+                            <button type="submit" class="btn btn-danger"><span class="fa fa-trash fa-2x"></span></button>
                         </form>
                     </div>
                     <div class="btn-group">
                         <form action="/{{gender}}/{{this.type_name}}/next" method="post">
-                            <button type="submit" class="btn btn-primary">انتقال به جلو</button>
+                            <button type="submit" class="btn btn-primary"><span class="fa fa-chevron-circle-right fa-2x"></span></button>
                         </form>
                     </div>
                 </div>
