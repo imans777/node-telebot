@@ -182,6 +182,21 @@ var csrfProtection = csrf();
 //----------------------------------------------------------------------------------------------------------------------
 
 // router.get('/:gender/:type/')
+var form = new formidable.IncomingForm();
+form.multiples = true;
+
+// router.get('/uploading_file/ajax_call/101/bitch', isLoggedIn, function (req, res, next) {
+//     console.log("I'm Here");
+//
+//     form.on('progress', function(bytesReceived, bytesExpected) {
+//         var percent_complete = (bytesReceived / bytesExpected) * 100;
+//         console.log(percent_complete.toFixed(2));
+//         // res.set('Content-Type', 'text/plain');
+//         res.send(percent_complete.toFixed(2));
+//         // res.end();
+//         // return;
+//     });
+// });
 
 router.post('/:gender/add', isLoggedIn, function(req, res, next) {
     Type.count({gender: req.params.gender}, function(err, c) {
@@ -391,8 +406,6 @@ router.post('/:gender/:type/:number/next', isLoggedIn, function (req, res, next)
 });
 
 router.post('/:gender/:type/add', isLoggedIn, function (req, res, next) {
-    var form = new formidable.IncomingForm();
-    form.multiples = true;
     form.parse(req, function (err, fields, files) {
         if(err) throw err;
 
@@ -401,90 +414,122 @@ router.post('/:gender/:type/add', isLoggedIn, function (req, res, next) {
         // console.log("-------");
         // console.log(files.filetoupload[0].path);
         // for(var one_file in files.filetoupload) {
-        async.forEachSeries(files.filetoupload, function(one_file, callback) {
-        // })
-        // files.filetoupload.forEachSeries(function(one_file, index) {
-        //     if(files.filetoupload.hasOwnProperty(one_file)) {
-            var p = './public';
-            if(!fs.existsSync(p))
-                fs.mkdirSync(p);
-            p += '/';
-
-            p += 'image';
-            if(!fs.existsSync(p))
-                fs.mkdirSync(p);
-            p += '/';
-
-            p += req.params.gender;
-            if(!fs.existsSync(p))
-                fs.mkdirSync(p);
-            p += '/';
-
-            p += req.params.type;
-            if(!fs.existsSync(p))
-                fs.mkdirSync(p);
-            p += '/';
-
-            var oldpath = one_file.path;
-            Product.find({gender: req.params.gender, type: req.params.type}).sort({picture: 'asc'}).exec(function(errf, docs) {
-                if(errf) throw errf;
-
-                if(docs.length == 0) {
-                    p += '1';
-                } else {
-                    var highest = get_number_path(docs[0].picture);
-                    docs.forEach(function (elem) {
-                        var n = get_number_path(elem.picture);
-                        if (highest < n) {
-                            highest = n;
-                        }
-                    });
-                    p += (highest + 1);
-                }
-                if(one_file.type == 'image/png')
-                    p += '.png';
-                else if(one_file.type == 'image/jpg')
-                    p += '.jpg';
-                else {
-                    console.log("WRONG EXTENSION");
+        if(Array.isArray(files.filetoupload)) {
+            async.forEachSeries(files.filetoupload, function(one_file, callback) {
+                // })
+                // files.filetoupload.forEachSeries(function(one_file, index) {
+                //     if(files.filetoupload.hasOwnProperty(one_file)) {
+                //     console.log(one_file);
+                //     console.log("------");
+                //     console.log(files.filetoupload);
+                add_product(one_file, req.params.gender, req.params.type, fields.description).then(function() {
                     callback();
-                }
-
-                var pro = new Product({
-                    number: (docs.length + 1),
-                    gender: req.params.gender,
-                    type: req.params.type,
-                    picture: get_normal_dir(p),
-                    description: fields.description
                 });
+                // }
+            }, function(erras) {
+                if(erras) throw erras;
 
-                pro.save(function(errr) {
-                    if(errr) throw errr;
-
-                    fs.rename(oldpath, p, function (error) {
-                        if (error) throw error;
-
-                        // console.log("S3");
-                        // count++;
-                        // if(count == files.length) {
-                        //     res.redirect('/' + req.params.gender + '/' + req.params.type);
-                        // } else {
-                        // console.log("S4: " + count);
-                        callback();
-                        // }
-                    });
-                });
-                // console.log(files.filetoupload);
+                res.redirect('/' + req.params.gender + '/' + req.params.type);
             });
-            // p += files.filetoupload.name;
-        // }
-        }, function(erras) {
-            if(erras) throw erras;
+        } else {
+            add_product(files.filetoupload, req.params.gender, req.params.type, fields.description).then(function() {
+                res.redirect('/' + req.params.gender + '/' + req.params.type);
+            });
+        }
 
-            res.redirect('/' + req.params.gender + '/' + req.params.type);
-        });
     });
 });
+
+function add_product(one_file, gender, type, desc) {
+    return new Promise(function(resolve, reject) {
+        // console.log(one_file);
+        // console.log()
+
+        var p = './public';
+        if(!fs.existsSync(p))
+            fs.mkdirSync(p);
+        p += '/';
+
+        p += 'image';
+        if(!fs.existsSync(p))
+            fs.mkdirSync(p);
+        p += '/';
+
+        p += gender;
+        if(!fs.existsSync(p))
+            fs.mkdirSync(p);
+        p += '/';
+
+        p += type;
+        if(!fs.existsSync(p))
+            fs.mkdirSync(p);
+        p += '/';
+
+        var oldpath = String(one_file.path);
+        Product.find({gender: gender, type: type}).sort({picture: 'asc'}).exec(function(errf, docs) {
+            if(errf) throw errf;
+
+            if(docs.length == 0) {
+                p += '1';
+            } else {
+                var highest = get_number_path(docs[0].picture);
+                docs.forEach(function (elem) {
+                    var n = get_number_path(elem.picture);
+                    if (highest < n) {
+                        highest = n;
+                    }
+                });
+                p += (highest + 1);
+            }
+
+            // var ext = (one_file? one_file.type: files.filetoupload.type);
+            var ext = String(one_file.type).split('/');
+            if(ext[0] != 'image') {
+                console.log("WRONG EXTENSION");
+                reject();
+            } else {
+                ext = ext[1];
+            }
+            p += '.';
+            p += ext;
+            // if(one_file.type == 'image/png')
+            //     p += '.png';
+            // else if(one_file.type == 'image/jpg')
+            //     p += '.jpg';
+            // else {
+            //     console.log("WRONG EXTENSION");
+            //     reject();
+            // }
+
+            var pro = new Product({
+                number: (docs.length + 1),
+                gender: gender,
+                type: type,
+                picture: get_normal_dir(p),
+                description: desc
+            });
+
+            pro.save(function(errr) {
+                if(errr) throw errr;
+
+                fs.rename(oldpath, p, function (error) {
+                    if (error) throw error;
+
+                    // console.log("S3");
+                    // count++;
+                    // if(count == files.length) {
+                    //     res.redirect('/' + req.params.gender + '/' + req.params.type);
+                    // } else {
+                    // console.log("S4: " + count);
+                    resolve();
+                    // }
+                });
+            });
+            // console.log(files.filetoupload);
+        });
+        // p += files.filetoupload.name;
+    });
+}
 
 router.post('/:gender/:type/previous', isLoggedIn, function(req, res, next) {
     move_type(req.params.gender, req.params.type, false).then(function(r) {

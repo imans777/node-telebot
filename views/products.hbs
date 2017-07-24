@@ -5,6 +5,11 @@
         </div>
     </div>
 </div>
+<div class="row">
+    <div class="col-md-12 uploading" id="uploading">
+        THIS IS SAMPLE TEXT
+    </div>
+</div>
 {{#each products}}
     <div class="row">
         {{#each this}}
@@ -52,10 +57,10 @@
                 <input type="file" name="filetoupload" multiple="multiple" accept="image/*" class="form-control" required><br>
             </div>
             <div class="form-group">
-                <input type="text" id="description" name="description" class="form-control" placeholder="توضیحات" required style="direction: rtl;">
+                <input type="text" id="description" name="description" class="form-control" placeholder="توضیحات" style="direction: rtl;">
             </div>
             {{!--<input type="hidden" name="_csrf" value="{{ csrfToken }}">--}}
-            <button type="submit" class="btn btn-primary btn-lg btn-block">افزودن محصول جدید</button>
+            <button type="submit" class="btn btn-primary btn-lg btn-block" id="submit_btn">افزودن محصول جدید</button>
         </form>
     </div>
 </div>

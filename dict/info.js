@@ -2,6 +2,7 @@
 
 const info = {
     my_channel_id: -1001145469147,                                               //the id of the channel the user must be a member of
+    telegram_test_token: '418136982:AAETpKRABqQKb2Wf_AZXU9r4612yDMw2iZ0',
     telegram_token: '433749058:AAH3QkAkKZcpey3ipITI4RFMr-IYGsBho6s',             //the telegram token taken from botfather
     telegram_admin_token: '433488720:AAEUWco0cMppZMuDmpysaqAYNHtB8QBuVeg',       //the telegram token taken from botfather for the admin
     telegram_channel_link: encodeURI('https://t.me/czteam'),                     //the link to the telegram channel
