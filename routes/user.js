@@ -185,18 +185,19 @@ var csrfProtection = csrf();
 var form = new formidable.IncomingForm();
 form.multiples = true;
 
-// router.get('/uploading_file/ajax_call/101/bitch', isLoggedIn, function (req, res, next) {
-//     console.log("I'm Here");
-//
-//     form.on('progress', function(bytesReceived, bytesExpected) {
-//         var percent_complete = (bytesReceived / bytesExpected) * 100;
-//         console.log(percent_complete.toFixed(2));
-//         // res.set('Content-Type', 'text/plain');
-//         res.send(percent_complete.toFixed(2));
-//         // res.end();
-//         // return;
-//     });
-// });
+router.get('/uploading_file/ajax_call/101/bitch', isLoggedIn, function (req, res, next) {
+    // console.log("I'm Here");
+
+    form.on('progress', function(bytesReceived, bytesExpected) {
+        var percent_complete = (bytesReceived / bytesExpected) * 100;
+        // console.log(percent_complete.toFixed(2));
+        // res.set('Content-Type', 'text/plain');
+        // res.json({percent: percent_complete.toFixed(2)});
+        // res.send();
+        res.end(percent_complete.toFixed(2));
+        // return;
+    });
+});
 
 router.post('/:gender/add', isLoggedIn, function(req, res, next) {
     Type.count({gender: req.params.gender}, function(err, c) {
@@ -405,7 +406,11 @@ router.post('/:gender/:type/:number/next', isLoggedIn, function (req, res, next)
     });
 });
 
+var cheerio = require('cheerio');
+
 router.post('/:gender/:type/add', isLoggedIn, function (req, res, next) {
+    form = new formidable.IncomingForm();
+    form.multiples = true;
     form.parse(req, function (err, fields, files) {
         if(err) throw err;
 
@@ -415,6 +420,7 @@ router.post('/:gender/:type/add', isLoggedIn, function (req, res, next) {
         // console.log(files.filetoupload[0].path);
         // for(var one_file in files.filetoupload) {
         if(Array.isArray(files.filetoupload)) {
+            console.log("MULTIPLE UPLOADING FILES");
             async.forEachSeries(files.filetoupload, function(one_file, callback) {
                 // })
                 // files.filetoupload.forEachSeries(function(one_file, index) {
@@ -424,20 +430,36 @@ router.post('/:gender/:type/add', isLoggedIn, function (req, res, next) {
                 //     console.log(files.filetoupload);
                 add_product(one_file, req.params.gender, req.params.type, fields.description).then(function() {
                     callback();
+                }).catch(function() {
+                    res.redirect('/' + req.params.gender + '/' + req.params.type);
                 });
                 // }
             }, function(erras) {
                 if(erras) throw erras;
 
-                res.redirect('/' + req.params.gender + '/' + req.params.type);
+                // setTimeout(function () {
+                    res.redirect('/' + req.params.gender + '/' + req.params.type);
+                // }, 30000);
             });
         } else {
+            console.log("SINGLE UPLOADING FILE");
             add_product(files.filetoupload, req.params.gender, req.params.type, fields.description).then(function() {
+                // setTimeout(function () {
+                    res.redirect('/' + req.params.gender + '/' + req.params.type);
+                // }, 30000);
+            }).catch(function() {
                 res.redirect('/' + req.params.gender + '/' + req.params.type);
             });
         }
-
     });
+
+    // var $c = cheerio.load('<div class="col-md-12 uploading" id="uploading">THIS</div>');
+
+    // form.on('progress', function(rec, exp) {
+    //     var per = (rec / exp) * 100;
+    //     console.log(per);
+    //     // alert(per);
+    // });
 });
 
 function add_product(one_file, gender, type, desc) {
@@ -484,7 +506,7 @@ function add_product(one_file, gender, type, desc) {
 
             // var ext = (one_file? one_file.type: files.filetoupload.type);
             var ext = String(one_file.type).split('/');
-            if(ext[0] != 'image') {
+            if(ext[0] != 'image' || ext.length < 2) {
                 console.log("WRONG EXTENSION");
                 reject();
             } else {
