@@ -6,7 +6,7 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-md-offset-5 col-md-2 col-sm-offset-5 col-sm-2 col-xs-offset-5 col-xs-2 uploading text-center bg-success progress_"
+    <div class="col-md-offset-4 col-md-4 col-sm-offset-4 col-sm-4 col-xs-offset-4 col-xs-4 uploading text-center bg-success progress_"
          id="uploading">
 
     </div>
@@ -43,18 +43,38 @@
                     {{!--</a>--}}
                     <div class="btn-group btn-group-justified">
                         <div class="btn-group">
+                            <form action="/{{gender}}/{{this.type}}/{{this.number}}/previous100" method="post">
+                                <button type="submit" class="btn btn-primary"><span class="fa fa-chevron-circle-left"><br>x100</span></button>
+                            </form>
+                        </div>
+                        <div class="btn-group">
+                            <form action="/{{gender}}/{{this.type}}/{{this.number}}/previous10" method="post">
+                                <button type="submit" class="btn btn-primary"><span class="fa fa-chevron-circle-left"><br>x10</span></button>
+                            </form>
+                        </div>
+                        <div class="btn-group">
                             <form action="/{{gender}}/{{this.type}}/{{this.number}}/previous" method="post">
-                                <button type="submit" class="btn btn-primary">انتقال به عقب</button>
+                                <button type="submit" class="btn btn-primary"><span class="fa fa-chevron-circle-left"><br>x1</span></button>
                             </form>
                         </div>
                         <div class="btn-group">
                             <form action="/{{gender}}/{{this.type}}/{{this.number}}/delete" method="post">
-                                <button type="submit" class="btn btn-danger">حذف محصول</button>
+                                <button type="submit" class="btn btn-danger"><span class="fa fa-trash fa-2x"></span></button>
                             </form>
                         </div>
                         <div class="btn-group">
                             <form action="/{{gender}}/{{this.type}}/{{this.number}}/next" method="post">
-                                <button type="submit" class="btn btn-primary">انتقال به جلو</button>
+                                <button type="submit" class="btn btn-primary"><span class="fa fa-chevron-circle-right"><br>x1</span></button>
+                            </form>
+                        </div>
+                        <div class="btn-group">
+                            <form action="/{{gender}}/{{this.type}}/{{this.number}}/next10" method="post">
+                                <button type="submit" class="btn btn-primary"><span class="fa fa-chevron-circle-right"><br>x10</span></button>
+                            </form>
+                        </div>
+                        <div class="btn-group">
+                            <form action="/{{gender}}/{{this.type}}/{{this.number}}/next100" method="post">
+                                <button type="submit" class="btn btn-primary"><span class="fa fa-chevron-circle-right"><br>x100</span></button>
                             </form>
                         </div>
                     </div>

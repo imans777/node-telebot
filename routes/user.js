@@ -215,6 +215,56 @@ router.post('/:gender/add', isLoggedIn, function(req, res, next) {
     });
 });
 
+router.post('/:gender/:type/:number/previous100', isLoggedIn, function (req, res, next) {
+    var temp = [];
+    for(var i = 0; i < 100; i++)
+        temp.push(i);
+    var cur_num = req.params.number;
+    async.forEachSeries(temp, function(t, callback) {
+        // console.log(t + " TIME");
+        move_product(req.params.gender, req.params.type, cur_num, false).then(function(r) {
+            // console.log("PASSED WITH " + cur_num);
+            if(!r) {
+                res.redirect('/' + req.params.gender + '/' + req.params.type);
+            } else {
+                cur_num --;
+                callback();
+            }
+        });
+    }, function(erras) {
+        if(erras) throw erras;
+        res.redirect('/' + req.params.gender + '/' + req.params.type);
+    });
+    // move_product(req.params.gender, req.params.type, req.params.number, false).then(function(r) {
+    //
+    // });
+});
+
+router.post('/:gender/:type/:number/previous10', isLoggedIn, function (req, res, next) {
+    var temp = [];
+    for(var i = 0; i < 10; i++)
+        temp.push(i);
+    var cur_num = req.params.number;
+    async.forEachSeries(temp, function(t, callback) {
+        // console.log(t + " TIME");
+        move_product(req.params.gender, req.params.type, cur_num, false).then(function(r) {
+            // console.log("PASSED WITH " + cur_num);
+            if(!r) {
+                res.redirect('/' + req.params.gender + '/' + req.params.type);
+            } else {
+                cur_num --;
+                callback();
+            }
+        });
+    }, function(erras) {
+        if(erras) throw erras;
+        res.redirect('/' + req.params.gender + '/' + req.params.type);
+    });
+    // move_product(req.params.gender, req.params.type, req.params.number, false).then(function(r) {
+    //
+    // });
+});
+
 router.post('/:gender/:type/:number/previous', isLoggedIn, function (req, res, next) {
     move_product(req.params.gender, req.params.type, req.params.number, false).then(function(r) {
         res.redirect('/' + req.params.gender + '/' + req.params.type);
@@ -400,13 +450,53 @@ function remove_files(wanted_doc) {
     });
 }
 
+router.post('/:gender/:type/:number/next100', isLoggedIn, function (req, res, next) {
+    var temp = [];
+    for(var i = 0; i < 100; i++)
+        temp.push(i);
+    var cur_num = req.params.number;
+    async.forEachSeries(temp, function(t, callback) {
+        move_product(req.params.gender, req.params.type, cur_num, true).then(function(r) {
+            if(!r) {
+                res.redirect('/' + req.params.gender + '/' + req.params.type);
+            } else {
+                cur_num ++;
+                callback();
+            }
+        });
+    }, function(erras) {
+        if(erras) throw erras;
+        res.redirect('/' + req.params.gender + '/' + req.params.type);
+    });
+});
+
+router.post('/:gender/:type/:number/next10', isLoggedIn, function (req, res, next) {
+    var temp = [];
+    for(var i = 0; i < 10; i++)
+        temp.push(i);
+    var cur_num = req.params.number;
+    async.forEachSeries(temp, function(t, callback) {
+        move_product(req.params.gender, req.params.type, cur_num, true).then(function(r) {
+            if(!r) {
+                res.redirect('/' + req.params.gender + '/' + req.params.type);
+            } else {
+                cur_num ++;
+                callback();
+            }
+        });
+    }, function(erras) {
+        if(erras) throw erras;
+        res.redirect('/' + req.params.gender + '/' + req.params.type);
+    });
+});
+
 router.post('/:gender/:type/:number/next', isLoggedIn, function (req, res, next) {
     move_product(req.params.gender, req.params.type, req.params.number, true).then(function(r) {
         res.redirect('/' + req.params.gender + '/' + req.params.type);
     });
 });
 
-var cheerio = require('cheerio');
+// var cheerio = require('cheerio');
 
 router.post('/:gender/:type/add', isLoggedIn, function (req, res, next) {
     form = new formidable.IncomingForm();
@@ -820,6 +910,10 @@ function move_product(gender, type, number, forward) {
             Product.findOne({gender: gender, type: type, number: number}).exec(function(errr, wanted_doc) {
                 if(errr)
                     throw errr;
+
+                if(!wanted_doc) {
+                    return resolved(false);
+                }
 
                 if(!forward) {
                     if(wanted_doc.number < 2)
