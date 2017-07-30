@@ -6,7 +6,7 @@ module.exports = {
         be_member_of_channel: encodeURI("لطفا حهت ادامه استفاده از روبات، ابتدا در کانال زیر عضو شوید: \n ")  + info.telegram_channel_link,
         telegram_channel_item: encodeURI("کانال تلگرام ما: \n ")  + info.telegram_channel_link,
         // instagram_page_item: encodeURI("لینک صفحه اینستاگرام: \n ") + info.instagram_page_link,
-        contact_us: encodeURI("جهت ارتباط با ما یا درخواست سفارش خود، به آیدی زیر مراجعه نمایید:" +
+        contact_us: encodeURI("جهت درخواست سفارش خود، به آیدی زیر مراجعه نمایید:" +
             "\n" +
             "@czonline"),
         time_reservation: encodeURI("برای تعیین وقت شوروم با شماره های زیر تماس بگیرید:" +
