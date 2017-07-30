@@ -70,7 +70,7 @@ var BUTTONS = {
         command: '/instagram_page'
     },
     contact_us: {
-        label: 'ارتباط با ما',
+        label: 'درخواست سفارش',
         command: '/contact_us'
     },
     time_reservation: {

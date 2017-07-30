@@ -718,7 +718,9 @@ router.post('/:gender/:type/delete', isLoggedIn, function(req, res, next) {
                             wanted_doc.remove(function(er) {
                                 if(er) throw er;
 
-                                res.redirect('/' + req.params.gender);
+                                remove_all_same_types(req.params.gender, req.params.type).then(function() {
+                                    res.redirect('/' + req.params.gender);
+                                });
                             });
                         }
                     });
@@ -727,7 +729,9 @@ router.post('/:gender/:type/delete', isLoggedIn, function(req, res, next) {
                         wanted_doc.remove(function(er) {
                             if(er) throw er;
 
-                            res.redirect('/' + req.params.gender);
+                            remove_all_same_types(req.params.gender, req.params.type).then(function() {
+                                res.redirect('/' + req.params.gender);
+                            });
                         });
                     }
                 }
@@ -735,6 +739,33 @@ router.post('/:gender/:type/delete', isLoggedIn, function(req, res, next) {
         });
     });
 });
+
+function remove_all_same_types(gender, type) {
+    return new Promise(function(resolved, reject) {
+        Product.find({gender: gender, type: type}).exec(function(err, docs) {
+            if(err) throw err;
+
+            if(docs.length == 0)
+                return resolved();
+
+            async.forEachSeries(docs, function(doc, callback) {
+                doc.remove(function(erremove) {
+                    if(erremove) throw erremove;
+
+                    fs.unlink(doc.botdir, function(errul) {
+                        if(errul) throw errul;
+
+                        callback();
+                    });
+                });
+            }, function(erras) {
+                if(erras) throw erras;
+
+                resolved();
+            });
+        });
+    });
+}
 
 router.post('/:gender/:type/next', isLoggedIn, function(req, res, next) {
     move_type(req.params.gender, req.params.type, true).then(function(r) {

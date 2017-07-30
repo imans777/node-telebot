@@ -31,12 +31,13 @@ module.exports = function(B) {
             [B.became_member.label]
         ],
         main_menu: [
+            [B.contact_us.label],
+            [B.time_reservation.label],
             [B.femele_collection.label, B.male_collection.label],
             [B.baby_collection.label, B.spouse_collection.label],
             [B.jewelry_collection.label, B.narriage_collection.label],
             [B.accessory_collection.label, B.kafsh_collection.label],
-            [B.telegram_channel.label, B.instagram_page.label],
-            [B.contact_us.label, B.time_reservation.label]
+            [B.telegram_channel.label, B.instagram_page.label]
         ],
         instagram_page: [
             [B.instagram_2.label, B.instagram_1.label],
