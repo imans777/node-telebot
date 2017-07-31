@@ -776,9 +776,18 @@ router.post('/:gender/:type/next', isLoggedIn, function(req, res, next) {
 router.get('/:gender/:type', isLoggedIn, function (req, res, next) {
     // console.log(req.params.gender);
     // console.log(req.params.type);
-    Product.find({gender: req.params.gender, type: req.params.type}).sort({number: 'asc'}).exec(function (err, docs) {
+    Product.find({gender: req.params.gender, type: req.params.type}).sort({number: -1}).exec(function (err, docs) {
         if(err)
             throw err;
+
+        //sorting numbers
+        // var nums = [];
+        // for(var i = docs.length - 1; i >= 0; i--) {
+        //     nums.push(docs[i].number);
+        // }
+        // for(var i = 0; i < docs.length; i++) {
+        //     docs[i].number = nums[i];
+        // }
 
         var tripleDocs = getProducts(docs);
 

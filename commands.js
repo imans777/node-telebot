@@ -428,10 +428,15 @@ module.exports = function(bot/*, botad*/) {
                             var current_product = [];
                             //set BUTTONS
                             // console.log('length: ' , docs.length);
+                            if(r.number == -1) {
+                                r.number += docs.length + 1;
+                            }
+
                             var num = {
-                                previous: ((r.number - 1) > 0? (r.number - 1): (r.number - 1 + docs.length)),
-                                next: r.number % docs.length + 1
+                                next: ((r.number - 1) > 0? (r.number - 1): (r.number - 1 + docs.length)),
+                                previous: r.number % docs.length + 1
                             };
+
                             // console.log('gotten number:');
                             // console.log(num);
                             // var next_num = r.number + 1;
@@ -518,7 +523,7 @@ module.exports = function(bot/*, botad*/) {
         var obj = {
             gender: get_gender(parts[0]),
             type: parts[1],
-            number: 1
+            number: -1
         };
         if(parts[2] && Number(parts[2])) {
             obj.number = Number(parts[2]);
