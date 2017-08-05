@@ -12,7 +12,7 @@ var commands = require('./commands');
 
 var bot = new Telebot({
     token: info.telegram_test_token,
-    usePlugins: ['namedButtons'],
+    usePlugins: ['namedButtons', 'askUser'],
     pluginConfig: {
         namedButtons: {
             buttons: BUTTONS

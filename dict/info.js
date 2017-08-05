@@ -47,6 +47,95 @@ const info = {
     collection: 'collection',
     previous: 'previous',
     next: 'next',
+
+    cancel: 'لغو درخواست',
+
+    time_reservation: 'تعیین وقت شوروم',
+    short_break_between_in_hour: 1,
+    delta_date_from_server: {
+        hour: 0, //8,
+        minute: 0, //30,
+    },
+    times: [
+        {
+            stringify: '10:30',
+            hour: 10,
+            end: 11,
+        }, {
+            stringify: '11:30',
+            hour: 11,
+            end: 12,
+        }, {
+            stringify: '12:30',
+            hour: 12,
+            end: 13,
+        }, {
+            stringify: '13:30',
+            hour: 13,
+            end: 14,
+        }, {
+            stringify: '14:30',
+            hour: 14,
+            end: 15,
+        }, {
+            stringify: '15:30',
+            hour: 15,
+            end: 16,
+        }, {
+            stringify: '16:30',
+            hour: 16,
+            end: 17,
+        }, {
+            stringify: '17:30',
+            hour: 17,
+            end: 18,
+        }
+    ],
+    days: {
+        Sat: {
+            label: 'شنبه',
+            command: '/res_sat',
+            name: 'Sat',
+            longname: 'Saturday'
+        },
+        Sun: {
+            label: 'یکشنبه',
+            command: '/res_sun',
+            name: 'Sun',
+            longname: 'Sunday'
+        },
+        Mon: {
+            label: 'دوشنبه',
+            command: '/res_mon',
+            name: 'Mon',
+            longname: 'Monday'
+        },
+        Tue: {
+            label: 'سه شنبه',
+            command: '/res_tue',
+            name: 'Tue',
+            longname: 'Tuesday'
+        },
+        Wed: {
+            label: 'چهارشنبه',
+            command: '/res_wed',
+            name: 'Wed',
+            longname: 'Wednesday'
+        },
+        Thu: {
+            label: 'پنجشنبه',
+            command: '/res_thu',
+            name: 'Thu',
+            longname: 'Thursday'
+        },
+        Fri: {
+            label: 'جمعه',
+            command: '/res_fri',
+            name: 'Fri',
+            longname: 'Friday'
+        }
+    },
+    time_errors: "time_errors",
 };
 
 

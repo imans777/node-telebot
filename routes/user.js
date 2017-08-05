@@ -11,6 +11,7 @@ var async = require('async');
 var User = require('../models/user');
 var Type = require('../models/type');
 var Product = require('../models/product');
+var Reservation = require('../schema/reservation');
 
 // var gravatar = require('gravatar');
 
@@ -180,6 +181,10 @@ var csrfProtection = csrf();
 // });
 
 //----------------------------------------------------------------------------------------------------------------------
+
+//TODO: show the requests on the main page (table: name/phone/day/hour/accept button/reject button)
+//TODO: test for multiple requests to see functionality (multiple phone needed)
+//HOPE It ends tommorrow so that I start django :D :D :D
 
 // router.get('/:gender/:type/')
 var form = new formidable.IncomingForm();

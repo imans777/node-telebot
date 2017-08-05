@@ -55,7 +55,7 @@ var BUTTONS = {
     },
     accessory_collection: {
         label: 'کالکشن اکسسوری',
-        command: 'accessory_collection'
+        command: '/accessory_collection'
     },
     accessory: {
         label: 'Accessory',
@@ -74,7 +74,7 @@ var BUTTONS = {
         command: '/contact_us'
     },
     time_reservation: {
-        label: 'تعیین وقت شوروم',
+        label: 'testtemp3948threj',
         command: '/time_reservation'
     },
 
@@ -139,7 +139,6 @@ var BUTTONS = {
         label: 'انگشتر',
         command: '/accessory_ring'
     },
-
     accessory_hat: {
         label: 'کلاه',
         command: '/accessory_hat'
@@ -209,8 +208,7 @@ var BUTTONS = {
 BUTTONS[info.male_collection_buttons_prefix + 'back'] = BUTTONS[info.femele_collection_buttons_prefix + 'back'] =
     BUTTONS[info.spouse_collection_buttons_prefix + 'back'] = BUTTONS[info.baby_collection_buttons_prefix + 'back'] =
     BUTTONS[info.narriage_collection_buttons_prefix + 'back'] = BUTTONS[info.jewelry_collection_buttons_prefix + 'back'] =
-    BUTTONS[info.kafsh_collection_buttons_prefix + 'back'] = BUTTONS[info.accessory_collection_buttons_prefix + 'back'] =
-    {
+    BUTTONS[info.kafsh_collection_buttons_prefix + 'back'] = BUTTONS[info.accessory_collection_buttons_prefix + 'back'] = {
     label: info.return_to_main_menu,
     command: '/main_menu'
 };

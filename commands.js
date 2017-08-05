@@ -4,9 +4,13 @@ var replies = require('./dict/replies')(BUTTONS);
 var messages = require('./dict/messages');
 var request = require('request');
 var fs = require('fs');
+var moment = require('moment');
+var async = require('async');
+
 var Type = require('./schema/type');
 // var com_same = require('./commands_same');
 var Product = require('./schema/product');
+var Reservation = require('./schema/reservation');
 
 module.exports = function(bot/*, botad*/) {
 
@@ -260,17 +264,17 @@ module.exports = function(bot/*, botad*/) {
     //     "THIS IS THIS", {replyMarkup: 'hide'});
     // });
 
-    bot.on(BUTTONS.accessory.command, function(msg, props) {
-        is_joined(msg).then(function(res) {
-            if(!res) {
-                return not_joined(msg);
-            } else {
-                return bot.sendMessage(msg.from.id, messages.normal.choose_type, {replyMarkup:
-                    bot.keyboard(replies.accessory, {resize: true})
-                });
-            }
-        });
-    });
+    // bot.on(BUTTONS.accessory.command, function(msg, props) {
+    //     is_joined(msg).then(function(res) {
+    //         if(!res) {
+    //             return not_joined(msg);
+    //         } else {
+    //             return bot.sendMessage(msg.from.id, messages.normal.choose_type, {replyMarkup:
+    //                 bot.keyboard(replies.accessory, {resize: true})
+    //             });
+    //         }
+    //     });
+    // });
 
     // bot.on('callbackQuery', function(msg) {
     //     // User message alert
@@ -325,17 +329,245 @@ module.exports = function(bot/*, botad*/) {
         });
     });
 
-    bot.on(BUTTONS.time_reservation.command, function(msg) {
-        is_joined(msg).then(function(res) {
-            if(!res) {
-                return not_joined(msg);
-            } else {
-                return bot.sendMessage(msg.from.id,
-                    decodeURI(messages.encoded.time_reservation));
-            }
+    bot.on('/سلام', function(msg) {
+        bot.sendMessage(msg.from.id, "Hi");
+    });
+
+    bot.on('/hi', function(msg) {
+        // is_joined(msg).then(function(res) {
+        //     if(!res) {
+        //         return not_joined(msg);
+        //     } else {
+        //         return bot.sendMessage(msg.from.id,
+        //             decodeURI(messages.encoded.time_reservation));
+        //     }
+        // });
+        var base = moment();
+        console.log(base);
+        base.hour(10).minute(30).second(0).millisecond(0);
+        var that = moment().format();
+
+        var t = moment(new Date()).year();
+        console.log(t);
+
+
+        console.log(base.get('year'));          //2017  (2017)
+        console.log(base.get('month'));         //7     (August - 8)
+        console.log(base.get('date'));          //2     (2th)
+        console.log(base.get('hour'));          //17    (17)
+        console.log(base.get('minute'));        //28    (28)
+        console.log(base.get('second'));        //49    (49)
+        console.log(base.get('millisecond'));   //769   (769)
+        console.log(base.day());                //3     (Wednesday - 5)
+        console.log(base.date());               //2     (2th)
+        console.log(base.format('ddd'));        //Wed   (Wed)
+
+        base.add(1, 'm'); //minute
+        base.add(1, 'h'); ///hour
+        base.add(1, 'd');
+        console.log(base.format('ddd'));        //Fri   -> Tommorrow is Fri
+        console.log("------");
+        console.log(base);
+        base.day('Sat');
+        console.log(base);
+        base.day('sat');
+        console.log(base);
+        base.day(2);
+        console.log(base);
+
+        // return bot.sendMessage(msg.from.id, "GIVE DAY.", {replyMarkup:
+        //     bot.keyboard([["Sat"], ["Sun"], ['cancel']], {resize: true}), ask: 'gotten_day'
+        // });
+    });
+
+    bot.on('/test', function(msg) {
+        Reservation.find({}).exec(function(err, docs) {
+            docs.forEach(function(elem, i) {
+                console.log(moment(elem.date));
+            });
         });
     });
 
+    bot.on(info.time_errors, function(msg, props) {
+        return Reservation.findOne({user_id: msg.from.id}).remove(function(err) {
+            if(err) throw err;
+            return error_occurred(msg.from.id);
+        });
+        // console.log("In Er");
+        // return bot.event(BUTTONS.main_menu.command, msg, props);
+    });
+
+    bot.on('ask.gotten_day', function(msg, props) {
+        if(msg.text == info.cancel) {
+            return;
+            // return bot.event(info.time_errors, msg, props);
+        }
+
+        // var times = get_hours(msg.text);
+        return get_hours(msg.text).then(function(hours) {
+
+            var time_with_day = moment(get_now());
+            var day_name = get_day_name_from_label(msg.text);
+            console.log("Day: " + day_name);
+            if(!day_name) {
+                //override the plan :D
+
+                // return;
+                throw "DAY NOT VALID";
+            }
+
+            while(time_with_day.format('ddd') != day_name) {
+                time_with_day.add(1, 'd');
+            }
+
+            var r = new Reservation({
+                date: time_with_day,
+                user_id: msg.from.id
+            });
+
+            r.save(function(errs) {
+                if(errs) throw errs;
+
+                var times = hours;
+                console.log(times);
+                //if times == SOMETHING_INVALID_RETURNED! => return to main menu along with a proper msg
+                times = get_proper_hours(times);
+                times.push([info.cancel]);
+                bot.sendMessage(msg.from.id, messages.normal.choose_hour, {replyMarkup:
+                    bot.keyboard(times, {resize: true}), ask: 'gotten_time'
+                });
+            });
+        }).catch(function(e) {
+            console.log("In Ca");
+            return error_occurred(msg.from.id);
+            // bot.sendMessage(msg.from.id,
+            //     messages.normal.main_menu_message, {replyMarkup:
+            //         bot.keyboard(replies.main_menu, {resize: true})});
+        });
+    });
+
+    bot.on('ask.gotten_time', function(msg, props) {
+        if(msg.text == info.cancel) {
+            //remove reservation
+            return;
+            // return Reservation.findOne({user_id: msg.from.id}).remove(function(errr) {
+            //     if(errr) throw errr;
+            //     return error_get_back_to_main_menu(msg.from.id);
+            // });
+            //     .catch(function(e) {
+            //     console.log("In Ca");
+            //     bot.sendMessage(msg.from.id,
+            //         messages.normal.main_menu_message, {replyMarkup:
+            //             bot.keyboard(replies.main_menu, {resize: true})});
+            // });
+            // return;
+        }
+
+        var pure_hour = get_normal_hour(msg.text);
+        if(!pure_hour) {
+            //override the plan :D
+            return bot.event(info.time_errors, msg, props);
+        }
+
+        return Reservation.findOne({user_id: msg.from.id}).exec(function(err, doc) {
+            if(err) throw err;
+
+            if(!doc) {
+                return error_occurred(msg.from.id);
+            }
+
+            doc.date = moment(doc.date).hour(pure_hour).minute(30).second(0).millisecond(0);
+            return doc.save(function(errs) {
+                if(errs) throw errs;
+
+                return bot.sendMessage(msg.from.id, messages.normal.choose_name, {replyMarkup:
+                    bot.keyboard([[info.cancel]], {resize: true}), ask: 'gotten_name'
+                });
+            });
+        });
+    });
+
+    bot.on('ask.gotten_name', function(msg, props) {
+        if(msg.text == info.cancel) {
+            //remove reservation
+            return;
+            // return Reservation.findOne({user_id: msg.from.id}).remove(function(errr) {
+            //     if(errr) throw errr;
+            //     return error_get_back_to_main_menu(msg.from.id);
+            // });
+            //     .catch(function(e) {
+            //     console.log("In Ca");
+            //     bot.sendMessage(msg.from.id,
+            //         messages.normal.main_menu_message, {replyMarkup:
+            //             bot.keyboard(replies.main_menu, {resize: true})});
+            // });
+        }
+
+        return Reservation.findOne({user_id: msg.from.id}).exec(function(err, doc) {
+            if(err) throw err;
+
+            if(!doc) {
+                return error_occurred(msg.from.id);
+            }
+
+            doc.name = msg.text;
+            return doc.save(function(errs) {
+                if(errs) throw errs;
+
+                return bot.sendMessage(msg.from.id, messages.normal.choose_phone, {replyMarkup:
+                    bot.keyboard([[bot.button('contact', 'ارسال شماره')], [info.cancel]], {resize: true})
+                });
+            });
+        });
+    });
+
+    // Buttons
+    // bot.on('/buttons', function(msg) {
+    //
+    //     var replyMarkup = bot.keyboard([
+    //         [bot.button('contact', 'Your contact')]
+    //     ], {resize: true});
+    //
+    //     return bot.sendMessage(msg.from.id, 'Button example.', {replyMarkup});
+    // });
+
+    bot.on(['contact'], function(msg, props) {
+        if(msg.text == info.cancel) {
+            //remove reservation
+            return Reservation.findOne({user_id: msg.from.id}).remove(function(errr) {
+                if(errr) throw errr;
+                return error_get_back_to_main_menu(msg.from.id);
+            });
+        }
+        console.log(props);
+        console.log(msg.contact);
+        return Reservation.findOne({user_id: msg.from.id}).exec(function(err, doc) {
+            if (err) throw err;
+
+            if (!doc) {
+                return error_occurred(msg.from.id);
+            }
+
+            doc.phone = msg.contact.phone_number;
+            doc.save(function(errs) {
+                if(errs) throw errs;
+
+                return bot.sendMessage(msg.from.id, messages.normal.reservation_set, {replyMarkup:
+                    bot.keyboard(replies.main_menu, {resize: true})
+                });
+            });
+        });
+    });
+
+    // bot.on(info.cancel, function(msg) {
+    //     console.log("cancel");
+    //     return Reservation.findOne({user_id: msg.from.id}).remove(function(err) {
+    //         if(err) throw err;
+    //         return bot.sendMessage(msg.from.id, messages.normal.reservation_canceled).then(function() {
+    //             return error_get_back_to_main_menu(msg.from.id);
+    //         });
+    //     })
+    // });
     bot.on('/hide', function(msg) {
         return bot.sendMessage(msg.from.id, "OK", {replyMarkup: 'hide'});
     });
@@ -344,7 +576,6 @@ module.exports = function(bot/*, botad*/) {
     //     bot.sendMessage(msg.from.id,
     //     "THIS IS FASHEN");
     // });
-
     // for(var button in BUTTONS) {
     //     if(BUTTONS.hasOwnProperty(button)) {
     //         if(button.indexOf(info.male) != -1 || button.indexOf(info.femele) != -1) {
@@ -363,6 +594,32 @@ module.exports = function(bot/*, botad*/) {
         is_joined(msg).then(function(res) {
             if(!res) {
                 return;
+            }
+
+            if(msg.text == info.time_reservation) {
+                //check if a reservation with such user_id exists or not
+                //if not, collect the form
+                //if  so, show its information with a cancel button
+                return Reservation.findOne({user_id: msg.from.id}).exec(function(err, doc) {
+                    if(err) throw err;
+
+                    if(doc) {
+                        return send_reserved_time_info(msg.from.id);
+                    } else {
+                        var days = get_days();
+                        days.push([info.cancel]);
+                        return bot.sendMessage(msg.from.id, messages.normal.choose_day, {replyMarkup:
+                            bot.keyboard(days, {resize: true}), ask: 'gotten_day'
+                        });
+                    }
+                });
+            } else if(msg.text == info.cancel) {
+                return Reservation.findOne({user_id: msg.from.id}).remove(function(err) {
+                    if(err) throw err;
+                    return bot.sendMessage(msg.from.id, messages.normal.reservation_canceled).then(function() {
+                        return error_get_back_to_main_menu(msg.from.id);
+                    });
+                });
             }
 
         // var but = {
@@ -451,7 +708,6 @@ module.exports = function(bot/*, botad*/) {
                             // console.log('replies:');
                             // console.log(current_product);
                             // console.log("Place: " + docs[r.number - 1].botdir);
-
                             // if(!docs[r.number - 1]) {
                             //     return error_get_back_to_main_menu(msg.from.id);
                             // }
@@ -508,11 +764,154 @@ module.exports = function(bot/*, botad*/) {
             bot.getChatMember(info.my_channel_id, msg.from.id).then(function (member) {
                 resolved(!(member.result.status == 'left' || member.result.status == 'kicked'));
             }).catch(function(r) {
-                console.log("Channel not found/admin");
-                console.log(r);
+                // console.log("Channel not found/admin");
+                // console.log(r);
                 resolved(true);
             });
         });
+    }
+
+    function get_days() {
+        var days = [];
+        var days_left = 7;
+        //now's hour plus a little amount so that he can't reserve instantly :D
+        var now = moment(get_now());
+
+        //test for time
+        // now.add(1, 'days');
+
+        //check the end of today,   if we're later than that, start from tomorrow
+        //                          if we're soner than that, start from today, decreasing "days_left"
+        //add every single days till 'days_left' becomes zero, if encountered friday, ignore
+        //---> DONE
+        var last_hour_of_now = moment(now);
+        last_hour_of_now.hour(info.times[info.times.length - 1].end).minute(30).second(0).millisecond(0);
+
+        if(now.isBefore(last_hour_of_now) && now.format('ddd') != info.days.Fri.name) {
+            // days.push([now.format('ddd')]);
+            days.push([info.days[now.format('ddd')].label]);
+            days_left --;
+        }
+        now.add(1, 'days');
+        while(days_left > 0) {
+            if(now.format('ddd') != info.days.Fri.name) {
+                // days.push([now.format('ddd')]);
+                days.push([info.days[now.format('ddd')].label]);
+            }
+            now.add(1, 'days');
+            days_left --;
+        }
+
+        console.log(days);
+        // console.log(last_hour_of_now);
+        return days;
+    }
+
+    function get_hours(day) {
+        return new Promise(function(resolved, reject) {
+            var now = moment(get_now());
+            var hours = [];
+            day = get_day_name_from_label(day);
+            if(!day) {
+                return resolved(null);
+            }
+
+            var reserved_day = moment(now); //chosen day
+            while (reserved_day.format('ddd') != day) {
+                reserved_day.add(1, 'd');
+            }
+
+            //check dates availability, then add each of them to the list (e.g for 10:30, only add '10' as number!)
+            //for thursday, check that the last hour is not valid
+            //attend the date! this monday is not the same as last monday! so date (2th Aug 2017) must be checked when fetching from db!
+            //maybe checking it with now with 'isBefore' works out, but should be considered more carefully!
+            //a for loop for each of the time, should it pass filters, it's added, otherwise it's ignored
+            //filters: available (not reserved before) / check thursday exception /
+
+            async.forEachSeries(info.times, function (this_time, callback) {
+
+                var wanted_time = moment(reserved_day).hour(this_time.hour).minute(30).second(0).millisecond(0); //chosen days with each hours
+                //for test only!
+                // wanted_time.add()
+                // var start_time; //chosen day - calculated hour
+                // var end_time; //day after chosen day - start of day! (so it doesn't affect tommorrow's dates
+                Reservation.findOne({date: wanted_time.valueOf()}).exec(function (err, doc) {
+                    if (err) throw err;
+
+                    // console.log("This is the doc");
+                    // console.log(doc);
+                    if (doc) {
+                        callback();
+                    } else {
+                        //check Thu
+                        if (moment(wanted_time).format('ddd') == info.days.Thu.name && this_time.hour == info.times[info.times.length - 1].hour) {
+                            callback();
+                        } else {
+                            hours.push([this_time.hour]);
+                            callback();
+                        }
+                    }
+                });
+
+            }, function (erras) {
+                if (erras) throw erras;
+                resolved(hours);
+            });
+        });
+    }
+
+    function get_proper_hours(hours) {
+        //turn 10/11/... to (10:30-11:30)/(11:30/12:30)/....
+        hours.forEach(function(hour, idx) {
+            info.times.forEach(function(time, index) {
+                if(hour[0] == time.hour) {
+                    hour[0] = String(time.hour) + String(":30 - ") + String(time.hour + 1) + String(":30");
+                    return;
+                }
+            });
+        });
+
+        return hours;
+    }
+
+    function get_normal_hour(hour) {
+        var normal_hour = hour;
+        var has_changed = false;
+        info.times.forEach(function(time, idx) {
+            var n_h = String(time.hour) + String(":30 - ") + String(time.hour + 1) + String(":30");
+            if(hour == n_h) {
+                normal_hour = time.hour;
+                has_changed = true;
+                return;
+            }
+        });
+        if(has_changed)
+            return normal_hour;
+        else
+            return null;
+    }
+
+    function get_day_name_from_label(day) {
+        if(day == info.days.Sat.label)
+            return info.days.Sat.name;
+        else if(day == info.days.Sun.label)
+            return info.days.Sun.name;
+        else if(day == info.days.Mon.label)
+            return info.days.Mon.name;
+        else if(day == info.days.Tue.label)
+            return info.days.Tue.name;
+        else if(day == info.days.Wed.label)
+            return info.days.Wed.name;
+        else if(day == info.days.Thu.label)
+            return info.days.Thu.name;
+        else if(day == info.days.Fri.label)
+            return info.days.Fri.name;
+        else
+            return null;
+    }
+
+    function get_now() {
+        return moment().add(info.delta_date_from_server.hour + info.short_break_between_in_hour, 'h').add(info.delta_date_from_server.minute, 'm');
     }
 
     function parse_command(cmd) { // /gender_type_number
@@ -568,13 +967,42 @@ module.exports = function(bot/*, botad*/) {
 
     function error_occurred(id, err = "Not recieved") {
         console.log(err);
-        bot.sendMessage(id, messages.normal.error_occurred, {replyMarkup:
+        return bot.sendMessage(id, messages.normal.error_occurred, {replyMarkup:
             bot.keyboard(replies.main_menu, {resize: true})
         });
     }
 
+    function send_reserved_time_info(id) {
+        return Reservation.findOne({user_id: id}).exec(function(err, doc) {
+            if(err) throw err;
+
+            var statement = make_statement_for_time_reservation(doc);
+            if(doc.accepted) {
+                statement += messages.normal.res.accepted;
+            } else if(doc.rejected) {
+                statement += messages.normal.res.rejected;
+            } else {
+                statement += messages.normal.res.not_yet;
+            }
+
+            return bot.sendMessage(id, decodeURI(statement), {replyMarkup:
+                bot.keyboard([[BUTTONS.main_menu.label], [info.cancel]], {resize: true}), parseMode: 'html'
+            });
+        });
+    }
+
+    function make_statement_for_time_reservation(doc) {
+        var statement = encodeURI(messages.normal.res.intro + "\n");
+        statement += String("نام: ") + doc.name + encodeURI("\n");
+        statement += String("شماره تلفن: ") + doc.phone + encodeURI("\n");
+        statement += String("روز: ") + info.days[moment(doc.date).format('ddd')].label + encodeURI("\n");
+        var hour = Number(moment(doc.date).format('h'));
+        statement += String("ساعت: ") + String(hour) + String(":30 - ") + String(hour + 1) + String(":30") + encodeURI("\n\n");
+        return statement;
+    }
+
     function error_get_back_to_main_menu(id) {
-        return bot.sendMessage(id, messages.normal.error_occurred, {replyMarkup:
+        return bot.sendMessage(id, messages.normal.main_menu_message, {replyMarkup:
             bot.keyboard(replies.main_menu ,{resize: true})
         });
     }
