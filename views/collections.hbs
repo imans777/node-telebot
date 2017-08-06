@@ -1,6 +1,91 @@
 <div class="row">
     <div class="col-md-12 col-sm-12">
         <div class="container">
+            <h1 class="bg-warning title-page">ارسال پیام همگانی</h1>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-offset-4 col-md-4 col-sm-offset-4 col-sm-4 col-xs-offset-4 col-xs-4">
+        <form action="/send_notif" method="post">
+            <div class="form-group">
+                <div class="input-group input-group-btn">
+                        <textarea dir="rtl" type="text" id="notif" name="notif" class="form-control"
+                                  placeholder="ارسال پیام به تمام استفاده کنندگان از ربات"
+                                  style="border-radius: 5px" rows="2"></textarea>
+                </div>
+
+            </div>
+            <div class="col-md-offset-4 col-md-4 col-sm-offset-4 col-sm-4 col-xs-offset-4 col-xs-4">
+                <button type="submit" class="btn btn-primary btn-lg">ارسال پیام</button>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12 col-sm-12">
+        <div class="container">
+            <h1 class="bg-warning title-page">زمانهای رزرو شده</h1>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="container">
+        <table class="table table-table-striped table-hover">
+            <thead>
+                <tr>
+                    <th class="text-center">حذف کامل</th>
+                    <th class="text-center">رد</th>
+                    <th class="text-center">تایید</th>
+                    <th class="text-center">ساعت</th>
+                    <th class="text-center">روز</th>
+                    <th class="text-center">شماره تلفن</th>
+                    <th class="text-center">نام</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each res}}
+                    <tr class="text-center">
+                        <td>
+                            <form action="/{{this.user_id}}/destroy_user" method="post">
+                                <button type="submit" class="btn btn-info"><span class="fa fa-trash"></span></button>
+                            </form>
+                        </td>
+                        {{#unless this.rejected}}
+                            <td>
+                                <form action="/{{this.user_id}}/remove_user" method="post">
+                                    <button type="submit" class="btn btn-info"><span class="fa fa-times"></span></button>
+                                </form>
+                            </td>
+                        {{else}}
+                            <td>
+                                <p>رد شده</p>
+                            </td>
+                        {{/unless}}
+                        {{#unless this.accepted}}
+                            <td>
+                                <form action="/{{this.user_id}}/accept_user" method="post">
+                                    <button type="submit" class="btn btn-info"><span class="fa fa-check"></span></button>
+                                </form>
+                            </td>
+                        {{else}}
+                            <td>
+                                <p>تایید شده</p>
+                            </td>
+                        {{/unless}}
+                        <td>{{this.hour}}</td>
+                        <td>{{this.day}} - {{this.short_date}}</td>
+                        <td>{{this.phone}}</td>
+                        <td>{{this.name}}</td>
+                    </tr>
+                {{/each}}
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12 col-sm-12">
+        <div class="container">
             <h1 class="bg-warning title-page">کالکشن‌ها</h1>
         </div>
     </div>

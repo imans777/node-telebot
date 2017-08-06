@@ -11,6 +11,8 @@ var Type = require('./schema/type');
 // var com_same = require('./commands_same');
 var Product = require('./schema/product');
 var Reservation = require('./schema/reservation');
+var Customer = require('./schema/customers');
+var Notif = require('./schema/notif');
 
 module.exports = function(bot/*, botad*/) {
 
@@ -134,22 +136,31 @@ module.exports = function(bot/*, botad*/) {
         //         }
         //     });
         // });
-        return bot.sendMessage(msg.from.id, messages.normal.greetings).then(function() {
-            is_joined(msg).then(function(res) {
-                if(!res) {
-                    not_joined(msg).catch(function(r) {
-                        console.log("error in start");
-                        console.log(r);
-                    });
-                } else {
-                    return bot.event(BUTTONS.main_menu.command, msg).catch(function(r) {
-                        console.log("error in start");
-                        console.log(r);
-                    });
-                }
-            }).catch(function(r) {
-                console.log("error in start");
-                console.log(r);
+        var cus = new Customer({
+            user_id: msg.from.id,
+            first_name: msg.from.first_name,
+            last_name: msg.from.last_name,
+            username: msg.from.username
+        });
+        return cus.save(function(errsc) {
+            if(errsc) throw errsc;
+            return bot.sendMessage(msg.from.id, messages.normal.greetings).then(function() {
+                is_joined(msg).then(function(res) {
+                    if(!res) {
+                        not_joined(msg).catch(function(r) {
+                            console.log("error in start");
+                            console.log(r);
+                        });
+                    } else {
+                        return bot.event(BUTTONS.main_menu.command, msg).catch(function(r) {
+                            console.log("error in start");
+                            console.log(r);
+                        });
+                    }
+                }).catch(function(r) {
+                    console.log("error in start");
+                    console.log(r);
+                });
             });
         });
     });
@@ -200,7 +211,6 @@ module.exports = function(bot/*, botad*/) {
     //         .then(set_replies.bind(null, msg, info.male))
     //         .then(set_on_collection.bind(null, msg));
     // });
-
     // bot.on("Back", function(msg) {
     //     return bot.sendMessage(msg.from.id, "Hi");
     // });
@@ -247,7 +257,6 @@ module.exports = function(bot/*, botad*/) {
     //         }
     //     });
     // });
-
     // function getMaleCollection(msg) {
     //     return new Promise(function(resolve, reject) {
     //
@@ -263,7 +272,6 @@ module.exports = function(bot/*, botad*/) {
     //     return bot.sendMessage(msg.from.id,
     //     "THIS IS THIS", {replyMarkup: 'hide'});
     // });
-
     // bot.on(BUTTONS.accessory.command, function(msg, props) {
     //     is_joined(msg).then(function(res) {
     //         if(!res) {
@@ -275,7 +283,6 @@ module.exports = function(bot/*, botad*/) {
     //         }
     //     });
     // });
-
     // bot.on('callbackQuery', function(msg) {
     //     // User message alert
     //     bot.sendMessage(msg.from.id,
@@ -333,52 +340,66 @@ module.exports = function(bot/*, botad*/) {
         bot.sendMessage(msg.from.id, "Hi");
     });
 
-    bot.on('/hi', function(msg) {
-        // is_joined(msg).then(function(res) {
-        //     if(!res) {
-        //         return not_joined(msg);
-        //     } else {
-        //         return bot.sendMessage(msg.from.id,
-        //             decodeURI(messages.encoded.time_reservation));
-        //     }
-        // });
-        var base = moment();
-        console.log(base);
-        base.hour(10).minute(30).second(0).millisecond(0);
-        var that = moment().format();
-
-        var t = moment(new Date()).year();
-        console.log(t);
-
-
-        console.log(base.get('year'));          //2017  (2017)
-        console.log(base.get('month'));         //7     (August - 8)
-        console.log(base.get('date'));          //2     (2th)
-        console.log(base.get('hour'));          //17    (17)
-        console.log(base.get('minute'));        //28    (28)
-        console.log(base.get('second'));        //49    (49)
-        console.log(base.get('millisecond'));   //769   (769)
-        console.log(base.day());                //3     (Wednesday - 5)
-        console.log(base.date());               //2     (2th)
-        console.log(base.format('ddd'));        //Wed   (Wed)
-
-        base.add(1, 'm'); //minute
-        base.add(1, 'h'); ///hour
-        base.add(1, 'd');
-        console.log(base.format('ddd'));        //Fri   -> Tommorrow is Fri
-        console.log("------");
-        console.log(base);
-        base.day('Sat');
-        console.log(base);
-        base.day('sat');
-        console.log(base);
-        base.day(2);
-        console.log(base);
-
-        // return bot.sendMessage(msg.from.id, "GIVE DAY.", {replyMarkup:
-        //     bot.keyboard([["Sat"], ["Sun"], ['cancel']], {resize: true}), ask: 'gotten_day'
-        // });
-    });
+    // bot.on('/hi', function(msg) {
+    //     // is_joined(msg).then(function(res) {
+    //     //     if(!res) {
+    //     //         return not_joined(msg);
+    //     //     } else {
+    //     //         return bot.sendMessage(msg.from.id,
+    //     //             decodeURI(messages.encoded.time_reservation));
+    //     //     }
+    //     // });
+    //     var base = moment();
+    //     console.log(base);
+    //     base.hour(10).minute(30).second(0).millisecond(0);
+    //     var that = moment().format();
+    //
+    //     var t = moment(new Date()).year();
+    //     console.log(t);
+    //
+    //
+    //     console.log(base.get('year'));          //2017  (2017)
+    //     console.log(base.get('month'));         //7     (August - 8)
+    //     console.log(base.get('date'));          //2     (2th)
+    //     console.log(base.get('hour'));          //17    (17)
+    //     console.log(base.get('minute'));        //28    (28)
+    //     console.log(base.get('second'));        //49    (49)
+    //     console.log(base.get('millisecond'));   //769   (769)
+    //     console.log(base.day());                //3     (Wednesday - 5)
+    //     console.log(base.date());               //2     (2th)
+    //     console.log(base.format('ddd'));        //Wed   (Wed)
+    //
+    //     base.add(1, 'm'); //minute
+    //     base.add(1, 'h'); ///hour
+    //     base.add(1, 'd');
+    //     console.log(base.format('ddd'));        //Fri   -> Tommorrow is Fri
+    //     console.log(base);
+    //     base.add(6, 'd');
+    //     console.log(base.format('ddd'));
+    //     console.log(base);
+    //     console.log("------");
+    //     console.log(base);
+    //     base.day('Sat');
+    //     console.log(base);
+    //     base.day('sat');
+    //     console.log(base);
+    //     base.day(2);
+    //     console.log(base);
+    //
+    //     // return bot.sendMessage(msg.from.id, "GIVE DAY.", {replyMarkup:
+    //     //     bot.keyboard([["Sat"], ["Sun"], ['cancel']], {resize: true}), ask: 'gotten_day'
+    //     // });
+    // });
+    // bot.on('/us', function(msg) {
+    //     console.log(msg.from);
+    // })
+    // bot.on('/now', function(msg) {
+    //     // return bot.sendMessage(msg.from.id, moment(get_now()));
+    //     var now = moment(get_now());
+    //     console.log(now);
+    //     console.log(now.format('ddd'));
+    //     console.log(now.format('YYYY/M/D'));
+    // });
 
     bot.on('/test', function(msg) {
         Reservation.find({}).exec(function(err, docs) {
@@ -411,11 +432,17 @@ module.exports = function(bot/*, botad*/) {
             console.log("Day: " + day_name);
             if(!day_name) {
                 //override the plan :D
-
                 // return;
                 throw "DAY NOT VALID";
             }
+            if(hours.length == 0) {
+                throw "NOT FREE HOURS ON THIS DAY";
+            }
 
+            var last_hour_of_now = moment(get_now()).hour(info.times[info.times.length - 1].hour).minute(30).second(0).millisecond(0);
+            if(last_hour_of_now.isSameOrBefore(time_with_day) && last_hour_of_now.format('ddd') == day_name) {
+                time_with_day.add(6, 'd');
+            }
             while(time_with_day.format('ddd') != day_name) {
                 time_with_day.add(1, 'd');
             }
@@ -439,7 +466,13 @@ module.exports = function(bot/*, botad*/) {
             });
         }).catch(function(e) {
             console.log("In Ca");
-            return error_occurred(msg.from.id);
+            if(e == "NOT FREE HOURS ON THIS DAY") {
+                return bot.sendMessage(msg.from.id, messages.normal.reservation_not_free_hour, {replyMarkup:
+                    bot.keyboard(replies.main_menu, {resize: true})
+                });
+            } else {
+                return error_occurred(msg.from.id);
+            }
             // bot.sendMessage(msg.from.id,
             //     messages.normal.main_menu_message, {replyMarkup:
             //         bot.keyboard(replies.main_menu, {resize: true})});
@@ -549,6 +582,7 @@ module.exports = function(bot/*, botad*/) {
             }
 
             doc.phone = msg.contact.phone_number;
+            doc.form_completed = true;
             doc.save(function(errs) {
                 if(errs) throw errs;
 
@@ -590,6 +624,55 @@ module.exports = function(bot/*, botad*/) {
     //
     // });
 
+    // var tick_delay = 10;
+    // bot.on('tick', function(msg) {
+    setInterval(function() {
+        // console.log(tick_delay);
+        // tick_delay --;
+        // if(tick_delay < 0) {
+            return Notif.findOne({}).exec(function(err, doc) {
+                if(err) throw err;
+                if(!doc) {
+                    // tick_delay = 10;
+                    return;
+                }
+
+                var m = doc.message;
+                return doc.remove(function(errr) {
+                    if(errr) throw errr;
+
+                    Customer.find({}).exec(function(errc, docs) {
+                        if(errc) throw errc;
+                        async.forEachSeries(docs, function(doc, callback) {
+                            bot.sendMessage(doc.user_id, m).then(function() {
+                                callback();
+                            });
+                        }, function() {
+                            // tick_delay = 10;
+                        });
+                    })
+                })
+            });
+        // }
+    }, 5 * 1000); //send notification from site to users
+    setInterval(function() {
+        console.log("here");
+        Reservation.find({}).exec(function(err, docs) {
+            if(err) throw err;
+            if(!docs) return;
+
+            docs.forEach(function(doc, i) {
+                var now = moment(get_now());
+                var reserved_time = moment(doc.date);
+                if(now.isSameOrAfter(reserved_time)) {
+                    docs[i].remove(function(errR) {
+                        if(errR) throw errR;
+                    })
+                }
+            });
+        });
+    }, 5 * 60 * 1000); //omit outdated reservations
+
     bot.on('text', function(msg, props) {
         is_joined(msg).then(function(res) {
             if(!res) {
@@ -614,7 +697,7 @@ module.exports = function(bot/*, botad*/) {
                     }
                 });
             } else if(msg.text == info.cancel) {
-                return Reservation.findOne({user_id: msg.from.id}).remove(function(err) {
+                return Reservation.findOne({user_id: msg.from.id, accepted: false}).remove(function(err) {
                     if(err) throw err;
                     return bot.sendMessage(msg.from.id, messages.normal.reservation_canceled).then(function() {
                         return error_get_back_to_main_menu(msg.from.id);
@@ -785,7 +868,7 @@ module.exports = function(bot/*, botad*/) {
         //add every single days till 'days_left' becomes zero, if encountered friday, ignore
         //---> DONE
         var last_hour_of_now = moment(now);
-        last_hour_of_now.hour(info.times[info.times.length - 1].end).minute(30).second(0).millisecond(0);
+        last_hour_of_now.hour(info.times[info.times.length - 1].hour).minute(30).second(0).millisecond(0);
 
         if(now.isBefore(last_hour_of_now) && now.format('ddd') != info.days.Fri.name) {
             // days.push([now.format('ddd')]);
@@ -817,9 +900,15 @@ module.exports = function(bot/*, botad*/) {
             }
 
             var reserved_day = moment(now); //chosen day
+            var last_hour_of_now = moment(get_now()).hour(info.times[info.times.length - 1].hour).minute(30).second(0).millisecond(0);
+            if(last_hour_of_now.isSameOrBefore(reserved_day)) {
+                reserved_day.add(6, 'd');
+            }
             while (reserved_day.format('ddd') != day) {
                 reserved_day.add(1, 'd');
             }
+
+            // console.log(reserved_day.format('YYYY/M/D - ddd - k:m:s'));
 
             //check dates availability, then add each of them to the list (e.g for 10:30, only add '10' as number!)
             //for thursday, check that the last hour is not valid
@@ -847,8 +936,18 @@ module.exports = function(bot/*, botad*/) {
                         if (moment(wanted_time).format('ddd') == info.days.Thu.name && this_time.hour == info.times[info.times.length - 1].hour) {
                             callback();
                         } else {
-                            hours.push([this_time.hour]);
-                            callback();
+                            //check The time to be after now
+                            console.log("CLOCKS:");
+                            console.log(wanted_time.format('YYYY/M/D - ddd - k:m:s'));
+                            console.log(reserved_day.format('YYYY/M/D - ddd - k:m:s'));
+                            console.log(wanted_time.isSameOrAfter(reserved_day));
+                            console.log("----------");
+                            if(wanted_time.isSameOrBefore(now)) {
+                                callback();
+                            } else {
+                                hours.push([this_time.hour]);
+                                callback();
+                            }
                         }
                     }
                 });
@@ -865,7 +964,7 @@ module.exports = function(bot/*, botad*/) {
         hours.forEach(function(hour, idx) {
             info.times.forEach(function(time, index) {
                 if(hour[0] == time.hour) {
-                    hour[0] = String(time.hour) + String(":30 - ") + String(time.hour + 1) + String(":30");
+                    hour[0] = String(time.hour) + String(":30 - ") + String(time.hour + 1);
                     return;
                 }
             });
@@ -878,7 +977,7 @@ module.exports = function(bot/*, botad*/) {
         var normal_hour = hour;
         var has_changed = false;
         info.times.forEach(function(time, idx) {
-            var n_h = String(time.hour) + String(":30 - ") + String(time.hour + 1) + String(":30");
+            var n_h = String(time.hour) + String(":30 - ") + String(time.hour + 1);
             if(hour == n_h) {
                 normal_hour = time.hour;
                 has_changed = true;
@@ -904,8 +1003,8 @@ module.exports = function(bot/*, botad*/) {
             return info.days.Wed.name;
         else if(day == info.days.Thu.label)
             return info.days.Thu.name;
-        else if(day == info.days.Fri.label)
-            return info.days.Fri.name;
+        // else if(day == info.days.Fri.label)
+        //     return info.days.Fri.name;
         else
             return null;
     }
@@ -977,16 +1076,19 @@ module.exports = function(bot/*, botad*/) {
             if(err) throw err;
 
             var statement = make_statement_for_time_reservation(doc);
+            var rep = [[BUTTONS.main_menu.label]];
             if(doc.accepted) {
                 statement += messages.normal.res.accepted;
             } else if(doc.rejected) {
                 statement += messages.normal.res.rejected;
+                rep.push([info.cancel]);
             } else {
                 statement += messages.normal.res.not_yet;
+                rep.push([info.cancel]);
             }
 
             return bot.sendMessage(id, decodeURI(statement), {replyMarkup:
-                bot.keyboard([[BUTTONS.main_menu.label], [info.cancel]], {resize: true}), parseMode: 'html'
+                bot.keyboard(rep, {resize: true}), parseMode: 'html'
             });
         });
     }
@@ -995,9 +1097,9 @@ module.exports = function(bot/*, botad*/) {
         var statement = encodeURI(messages.normal.res.intro + "\n");
         statement += String("نام: ") + doc.name + encodeURI("\n");
         statement += String("شماره تلفن: ") + doc.phone + encodeURI("\n");
-        statement += String("روز: ") + info.days[moment(doc.date).format('ddd')].label + encodeURI("\n");
-        var hour = Number(moment(doc.date).format('h'));
-        statement += String("ساعت: ") + String(hour) + String(":30 - ") + String(hour + 1) + String(":30") + encodeURI("\n\n");
+        statement += String("روز: ") + info.days[moment(doc.date).format('ddd')].label + String(" " + doc.short_date) + encodeURI("\n");
+        var hour = Number(moment(doc.date).format('k'));
+        statement += String("ساعت: ") + String(hour) + String(":30 - ") + String(hour + 1) + encodeURI("\n\n");
         return statement;
     }
 

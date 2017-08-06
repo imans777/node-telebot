@@ -12,7 +12,7 @@ var User = require('../models/user');
 var Type = require('../models/type');
 var Product = require('../models/product');
 var Reservation = require('../schema/reservation');
-
+var Notif = require('../schema/notif');
 // var gravatar = require('gravatar');
 
 var csrfProtection = csrf();
@@ -208,7 +208,7 @@ router.post('/:gender/add', isLoggedIn, function(req, res, next) {
     Type.count({gender: req.params.gender}, function(err, c) {
         var type = new Type({
             gender: req.params.gender,
-            type_name: req.body.type,
+            type_name: String(req.body.type).trim(),
             priority: (c + 1)
         });
         type.save(function (err) {
@@ -549,7 +549,6 @@ router.post('/:gender/:type/add', isLoggedIn, function (req, res, next) {
     });
 
     // var $c = cheerio.load('<div class="col-md-12 uploading" id="uploading">THIS</div>');
-
     // form.on('progress', function(rec, exp) {
     //     var per = (rec / exp) * 100;
     //     console.log(per);
@@ -778,6 +777,46 @@ router.post('/:gender/:type/next', isLoggedIn, function(req, res, next) {
     });
 });
 
+router.post('/:id/remove_user', isLoggedIn, function(req, res, next) {
+    Reservation.findOne({user_id: req.params.id}).exec(function(err, doc) {
+        if(err || !doc) throw err;
+
+        doc.rejected = true;
+        doc.accepted = false;
+        doc.save(function(errs) {
+            if(errs) throw errs;
+
+            res.redirect('/collections');
+        });
+    });
+});
+
+router.post('/:id/accept_user', isLoggedIn, function(req, res, next) {
+    Reservation.findOne({user_id: req.params.id}).exec(function(err, doc) {
+        if(err || !doc) throw err;
+
+        doc.rejected = false;
+        doc.accepted = true;
+        doc.save(function(errs) {
+            if(errs) throw errs;
+
+            res.redirect('/collections');
+        });
+    });
+});
+
+router.post('/:id/destroy_user', isLoggedIn, function(req, res, next) {
+    Reservation.findOne({user_id: req.params.id}).exec(function(err, doc) {
+        if(err || !doc) throw err;
+
+        doc.remove(function(errs) {
+            if(errs) throw errs;
+
+            res.redirect('/collections');
+        });
+    });
+});
+
 router.get('/:gender/:type', isLoggedIn, function (req, res, next) {
     // console.log(req.params.gender);
     // console.log(req.params.type);
@@ -802,6 +841,16 @@ router.get('/:gender/:type', isLoggedIn, function (req, res, next) {
             type: req.params.type,
             products: tripleDocs
         });
+    })
+});
+
+router.post('/send_notif', isLoggedIn, function(req, res, next) {
+    var n = new Notif({
+        message: req.body.notif
+    });
+    n.save(function(errS) {
+        if(errS) throw errS;
+        res.redirect('/collections');
     })
 });
 
@@ -839,9 +888,14 @@ router.get('/collections', isLoggedIn, function(req, res, next) {
             label: 'کالکشن اکسسوری',
             command: '/accessory'
         }
-    }
-    res.render('collections', {
-        col: collections
+    };
+    Reservation.find({form_completed: true}).sort({date: 'asc'}).exec(function(err, docs) {
+        if(err) throw err;
+
+        res.render('collections', {
+            col: collections,
+            res: docs
+        });
     });
 });
 

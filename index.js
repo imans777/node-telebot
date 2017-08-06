@@ -35,7 +35,6 @@ var bot = new Telebot({
 //     console.log("Here");
 // });
 // commands_admin(newbot);
-
 // commands.HIDE(bot);
 // commands.START(bot, info);
 commands(bot/*, newbot*/);
