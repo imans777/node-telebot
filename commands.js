@@ -396,6 +396,12 @@ module.exports = function(bot/*, botad*/) {
         console.log(now);
         console.log(now.format('ddd'));
         console.log(now.format('YYYY/M/D'));
+
+        var meme = require('moment-jalaali');
+        var n = meme();
+        console.log(n);
+        console.log(n.format('ddd'));
+        console.log(meme(now).format('jYYYY/jM/jD k:m:s'));
     });
 
     bot.on('/test', function(msg) {
@@ -898,7 +904,7 @@ module.exports = function(bot/*, botad*/) {
 
             var reserved_day = moment(now); //chosen day
             var last_hour_of_now = moment(get_now()).hour(info.times[info.times.length - 1].hour).minute(30).second(0).millisecond(0);
-            if(last_hour_of_now.isSameOrBefore(reserved_day)) {
+            if(last_hour_of_now.isSameOrBefore(reserved_day) && last_hour_of_now.format('ddd') == day) {
                 reserved_day.add(6, 'd');
             }
             while (reserved_day.format('ddd') != day) {
@@ -926,6 +932,7 @@ module.exports = function(bot/*, botad*/) {
 
                     // console.log("This is the doc");
                     // console.log(doc);
+                    //check Existence
                     if (doc) {
                         callback();
                     } else {
@@ -1094,7 +1101,7 @@ module.exports = function(bot/*, botad*/) {
         var statement = encodeURI(messages.normal.res.intro + "\n");
         statement += String("نام: ") + doc.name + encodeURI("\n");
         statement += String("شماره تلفن: ") + doc.phone + encodeURI("\n");
-        statement += String("روز: ") + info.days[moment(doc.date).format('ddd')].label + String(" " + doc.short_date) + encodeURI("\n");
+        statement += String("روز: ") + info.days[moment(doc.date).format('ddd')].label + String(" " + doc.short_date_jalaali) + encodeURI("\n");
         var hour = Number(moment(doc.date).format('k'));
         statement += String("ساعت: ") + String(hour) + String(":30 - ") + String(hour + 1) + encodeURI("\n\n");
         return statement;

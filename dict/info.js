@@ -53,7 +53,7 @@ const info = {
     time_reservation: 'تعیین وقت شوروم',
     short_break_between_in_hour: 1,
     delta_date_from_server: {
-        hour: 0, //7,
+        hour: 0, //8,
         minute: 0, //30,
     },
     times: [

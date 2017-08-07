@@ -1,5 +1,7 @@
 var mongoose = require('mongoose');
 var moment = require('moment');
+var momentJ = require('moment-jalaali');
+// momentJ.loadPersian({usePersianDigits: true});
 var Schema = mongoose.Schema;
 var info = require('../dict/info');
 
@@ -29,6 +31,11 @@ schema.virtual('day').get(function() {
 
 schema.virtual('short_date').get(function() {
     var date = moment(this.date).format('YYYY/M/D');
+    return date;
+});
+
+schema.virtual('short_date_jalaali').get(function() {
+    var date = momentJ(this.date).format('jYYYY/jM/jD');
     return date;
 });
 

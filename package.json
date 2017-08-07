@@ -25,6 +25,7 @@
     "gravatar": "^1.6.0",
     "hbs": "~4.0.1",
     "moment": "^2.18.1",
+    "moment-jalaali": "^0.7.0",
     "mongoose": "^4.9.3",
     "morgan": "~1.8.1",
     "passport": "^0.3.2",
