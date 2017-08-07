@@ -556,6 +556,24 @@ router.post('/:gender/:type/add', isLoggedIn, function (req, res, next) {
     // });
 });
 
+router.post('/:gender/:type/reverse_products', isLoggedIn, function(req, res, next) {
+    Product.find({gender: req.params.gender, type: req.params.type}).sort({number: 'asc'}).exec(function(err, docs) {
+        if(err) throw err;
+
+        var count = docs.length;
+        async.forEachSeries(docs, function(doc, callback) {
+            doc.number = count;
+            doc.save(function(errs) {
+                if(errs) throw errs;
+                count --;
+                callback();
+            });
+        }, function(e) {
+            res.redirect('/' + req.params.gender + '/' + req.params.type);
+        });
+    })
+});
+
 function add_product(one_file, gender, type, desc) {
     return new Promise(function(resolve, reject) {
         // console.log(one_file);

@@ -340,66 +340,63 @@ module.exports = function(bot/*, botad*/) {
         bot.sendMessage(msg.from.id, "Hi");
     });
 
-    // bot.on('/hi', function(msg) {
-    //     // is_joined(msg).then(function(res) {
-    //     //     if(!res) {
-    //     //         return not_joined(msg);
-    //     //     } else {
-    //     //         return bot.sendMessage(msg.from.id,
-    //     //             decodeURI(messages.encoded.time_reservation));
-    //     //     }
-    //     // });
-    //     var base = moment();
-    //     console.log(base);
-    //     base.hour(10).minute(30).second(0).millisecond(0);
-    //     var that = moment().format();
-    //
-    //     var t = moment(new Date()).year();
-    //     console.log(t);
-    //
-    //
-    //     console.log(base.get('year'));          //2017  (2017)
-    //     console.log(base.get('month'));         //7     (August - 8)
-    //     console.log(base.get('date'));          //2     (2th)
-    //     console.log(base.get('hour'));          //17    (17)
-    //     console.log(base.get('minute'));        //28    (28)
-    //     console.log(base.get('second'));        //49    (49)
-    //     console.log(base.get('millisecond'));   //769   (769)
-    //     console.log(base.day());                //3     (Wednesday - 5)
-    //     console.log(base.date());               //2     (2th)
-    //     console.log(base.format('ddd'));        //Wed   (Wed)
-    //
-    //     base.add(1, 'm'); //minute
-    //     base.add(1, 'h'); ///hour
-    //     base.add(1, 'd');
-    //     console.log(base.format('ddd'));        //Fri   -> Tommorrow is Fri
-    //     console.log(base);
-    //     base.add(6, 'd');
-    //     console.log(base.format('ddd'));
-    //     console.log(base);
-    //     console.log("------");
-    //     console.log(base);
-    //     base.day('Sat');
-    //     console.log(base);
-    //     base.day('sat');
-    //     console.log(base);
-    //     base.day(2);
-    //     console.log(base);
-    //
-    //     // return bot.sendMessage(msg.from.id, "GIVE DAY.", {replyMarkup:
-    //     //     bot.keyboard([["Sat"], ["Sun"], ['cancel']], {resize: true}), ask: 'gotten_day'
-    //     // });
-    // });
-    // bot.on('/us', function(msg) {
-    //     console.log(msg.from);
-    // })
-    // bot.on('/now', function(msg) {
-    //     // return bot.sendMessage(msg.from.id, moment(get_now()));
-    //     var now = moment(get_now());
-    //     console.log(now);
-    //     console.log(now.format('ddd'));
-    //     console.log(now.format('YYYY/M/D'));
-    // });
+    bot.on('/hi', function(msg) {
+        // is_joined(msg).then(function(res) {
+        //     if(!res) {
+        //         return not_joined(msg);
+        //     } else {
+        //         return bot.sendMessage(msg.from.id,
+        //             decodeURI(messages.encoded.time_reservation));
+        //     }
+        // });
+        var base = moment();
+        console.log(base);
+        base.hour(10).minute(30).second(0).millisecond(0);
+        var that = moment().format();
+
+        var t = moment(new Date()).year();
+        console.log(t);
+
+
+        console.log(base.get('year'));          //2017  (2017)
+        console.log(base.get('month'));         //7     (August - 8)
+        console.log(base.get('date'));          //2     (2th)
+        console.log(base.get('hour'));          //17    (17)
+        console.log(base.get('minute'));        //28    (28)
+        console.log(base.get('second'));        //49    (49)
+        console.log(base.get('millisecond'));   //769   (769)
+        console.log(base.day());                //3     (Wednesday - 5)
+        console.log(base.date());               //2     (2th)
+        console.log(base.format('ddd'));        //Wed   (Wed)
+
+        base.add(1, 'm'); //minute
+        base.add(1, 'h'); ///hour
+        base.add(1, 'd');
+        console.log(base.format('ddd'));        //Fri   -> Tommorrow is Fri
+        console.log(base);
+        base.add(6, 'd');
+        console.log(base.format('ddd'));
+        console.log(base);
+        console.log("------");
+        console.log(base);
+        base.day('Sat');
+        console.log(base);
+        base.day('sat');
+        console.log(base);
+        base.day(2);
+        console.log(base);
+
+        // return bot.sendMessage(msg.from.id, "GIVE DAY.", {replyMarkup:
+        //     bot.keyboard([["Sat"], ["Sun"], ['cancel']], {resize: true}), ask: 'gotten_day'
+        // });
+    });
+    bot.on('/now', function(msg) {
+        // return bot.sendMessage(msg.from.id, moment(get_now()));
+        var now = moment(get_now());
+        console.log(now);
+        console.log(now.format('ddd'));
+        console.log(now.format('YYYY/M/D'));
+    });
 
     bot.on('/test', function(msg) {
         Reservation.find({}).exec(function(err, docs) {
@@ -656,10 +653,10 @@ module.exports = function(bot/*, botad*/) {
         // }
     }, 5 * 1000); //send notification from site to users
     setInterval(function() {
-        console.log("here");
+        // console.log("here");
         Reservation.find({}).exec(function(err, docs) {
             if(err) throw err;
-            if(!docs) return;
+            if(docs.length == 0) return;
 
             docs.forEach(function(doc, i) {
                 var now = moment(get_now());
@@ -671,7 +668,7 @@ module.exports = function(bot/*, botad*/) {
                 }
             });
         });
-    }, 5 * 60 * 1000); //omit outdated reservations
+    }, 15 * 60 * 1000); //omit outdated reservations
 
     bot.on('text', function(msg, props) {
         is_joined(msg).then(function(res) {

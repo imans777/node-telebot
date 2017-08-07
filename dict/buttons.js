@@ -80,15 +80,15 @@ var BUTTONS = {
 
     //------------------------------------ THIS IS FOR INSTAGRAM PAGES
     instagram_1: {
-        label: 'پیج اصلی کمرون زیگزال (محصولات جدید)',
+        label: 'پیج اصلی',
         command: '/instagram_1'
     },
     instagram_2: {
-        label: 'پیج دوم مجموعه (محصولات گذشته)',
+        label: 'czline',
         command: '/instagram_2'
     },
     instagram_3: {
-        label: 'پیج فروش آنلاین (قیمت محصولات)',
+        label: 'فروش آنلاین',
         command: '/instagram_3'
     },
     instagram_4: {
