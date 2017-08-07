@@ -513,12 +513,37 @@ module.exports = function(bot/*, botad*/) {
             }
 
             doc.date = moment(doc.date).hour(pure_hour).minute(30).second(0).millisecond(0);
-            return doc.save(function(errs) {
-                if(errs) throw errs;
+            return Reservation.find({date: doc.date.valueOf()}).exec(function(err_t, docs_t) {
+                if(err_t) throw err_t;
 
-                return bot.sendMessage(msg.from.id, messages.normal.choose_name, {replyMarkup:
-                    bot.keyboard([[info.cancel]], {resize: true}), ask: 'gotten_name'
+                var pass = true;
+                console.log(docs_t);
+                docs_t.forEach(function(d, i) {
+                    if(d.user_id != msg.from.id) {
+                        if(moment(d.date).isSame(moment(doc.date))) {
+                            pass = false;
+                            return;
+                        }
+                    }
                 });
+
+                if(!pass) {
+                    return doc.remove(function(err_r) {
+                        if(err_r) throw err_r;
+                        return error_occurred(msg.from.id);
+                    });
+                } else {
+                    return doc.save(function(errs) {
+                        if(errs) throw errs;
+
+                        return bot.sendMessage(msg.from.id, messages.normal.choose_name, {replyMarkup:
+                            bot.keyboard([[info.cancel]], {resize: true}), ask: 'gotten_name'
+                        });
+                    });
+                }
+            }).catch(function(e) {
+                console.log(e);
+                return error_occurred(msg.from.id);
             });
         });
     });
@@ -941,11 +966,11 @@ module.exports = function(bot/*, botad*/) {
                             callback();
                         } else {
                             //check The time to be after now
-                            console.log("CLOCKS:");
-                            console.log(wanted_time.format('YYYY/M/D - ddd - k:m:s'));
-                            console.log(reserved_day.format('YYYY/M/D - ddd - k:m:s'));
-                            console.log(wanted_time.isSameOrAfter(reserved_day));
-                            console.log("----------");
+                            // console.log("CLOCKS:");
+                            // console.log(wanted_time.format('YYYY/M/D - ddd - k:m:s'));
+                            // console.log(reserved_day.format('YYYY/M/D - ddd - k:m:s'));
+                            // console.log(wanted_time.isSameOrAfter(reserved_day));
+                            // console.log("----------");
                             if(wanted_time.isSameOrBefore(now)) {
                                 callback();
                             } else {
