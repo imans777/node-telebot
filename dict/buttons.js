@@ -122,11 +122,11 @@ var BUTTONS = {
 
     //------------------------------------ THIS IS FOR PREVIOUS AND NEXTs
     previous: {
-        label: 'm_قبلی',
+        label: 'm_سه تای قبلی',
         command: '/main_menu'
     },
     next: {
-        label: 'm_بعدی',
+        label: 'm_سه تای بعدی',
         command: '/main_menu'
     },
     return_back: {
