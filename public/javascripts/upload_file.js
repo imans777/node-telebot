@@ -7,6 +7,14 @@
     // setInterval(function() {
 $(function() {
 
+    // var linkElement = document.createElement("link");
+    // linkElement.rel = "stylesheet";
+    // linkElement.media = "screen";
+    // linkElement.href = "https://fontlibrary.org/face/iranian-sans";
+    // // linkElement.type =
+    // document.head.appendChild(linkElement);
+    // alert("added");
+
 
     // $("#uploading").html("Hi");
     // $.ajax({

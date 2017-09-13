@@ -12,6 +12,7 @@ var User = require('../models/user');
 var Type = require('../models/type');
 var Product = require('../models/product');
 var Reservation = require('../schema/reservation');
+var Customer = require('../schema/customers');
 var Notif = require('../schema/notif');
 // var gravatar = require('gravatar');
 
@@ -907,12 +908,15 @@ router.get('/collections', isLoggedIn, function(req, res, next) {
             command: '/accessory'
         }
     };
-    Reservation.find({form_completed: true}).sort({date: 'asc'}).exec(function(err, docs) {
-        if(err) throw err;
+    Customer.count({}).exec(function(errc, c) {
+        Reservation.find({form_completed: true}).sort({date: 'asc'}).exec(function(err, docs) {
+            if(err) throw err;
 
-        res.render('collections', {
-            col: collections,
-            res: docs
+            res.render('collections', {
+                col: collections,
+                res: docs,
+                customers_count: c
+            });
         });
     });
 });
