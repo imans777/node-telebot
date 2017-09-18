@@ -802,6 +802,7 @@ router.post('/:id/remove_user', isLoggedIn, function(req, res, next) {
 
         doc.rejected = true;
         doc.accepted = false;
+        doc.is_active_notif = true;
         doc.save(function(errs) {
             if(errs) throw errs;
 
@@ -816,6 +817,7 @@ router.post('/:id/accept_user', isLoggedIn, function(req, res, next) {
 
         doc.rejected = false;
         doc.accepted = true;
+        doc.is_active_notif = true;
         doc.save(function(errs) {
             if(errs) throw errs;
 

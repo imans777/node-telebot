@@ -316,16 +316,16 @@ module.exports = function(bot/*, botad*/) {
     });
 
     bot.on(BUTTONS.instagram_page.command, function(msg) {
-        is_joined_FIXED(msg).then(function(res) {
-            if(!res) {
-                 not_joined(msg);
-            } else {
+        // is_joined_FIXED(msg).then(function(res) {
+        //     if(!res) {
+        //          not_joined(msg);
+        //     } else {
                  bot.sendMessage(msg.from.id,
                     messages.normal.instagram_choose_page, {replyMarkup:
                     bot.keyboard(replies.instagram_page, {resize: true})
                 });
-            }
-        });
+            // }
+        // });
     });
 
     bot.on([BUTTONS.instagram_1.command, BUTTONS.instagram_2.command,
@@ -526,7 +526,7 @@ module.exports = function(bot/*, botad*/) {
             }
 
             doc.date = moment(doc.date).hour(pure_hour).minute(30).second(0).millisecond(0);
-             Reservation.find({date: doc.date.valueOf()}).exec(function(err_t, docs_t) {
+            Reservation.find({date: doc.date.valueOf()}).exec(function(err_t, docs_t) {
                 if(err_t) throw err_t;
 
                 var pass = true;
@@ -541,7 +541,7 @@ module.exports = function(bot/*, botad*/) {
                 });
 
                 if(!pass) {
-                     doc.remove(function(err_r) {
+                    doc.remove(function(err_r) {
                         if(err_r) throw err_r;
                          error_occurred(msg.from.id);
                     });
@@ -671,6 +671,18 @@ module.exports = function(bot/*, botad*/) {
         // console.log(tick_delay);
         // tick_delay --;
         // if(tick_delay < 0) {
+        //if the user's been accepted or rejected, send him a message from here
+            Reservation.find({is_active_notif: true}).exec(function(err, docs) {
+                if(err) throw err;
+
+                docs.forEach(function(doc) {
+                    doc.is_active_notif = false;
+                    doc.save(function(errs) {
+                        if(errs) throw errs;
+                        bot.sendMessage(doc.user_id, messages.normal.res.responded);
+                    })
+                });
+            });
              Notif.findOne({}).exec(function(err, doc) {
                 if(err) throw err;
                 if(!doc) {
@@ -715,6 +727,13 @@ module.exports = function(bot/*, botad*/) {
     }, 15 * 60 * 1000); //omit outdated reservations
 
     bot.on('text', function(msg, props) {
+
+        if(is_from_existed_buttons(msg.text)) {
+
+            return;
+        }
+        console.log("passed");
+
         set_p_n(msg).then(is_joined_FIXED.bind(null, msg)).then(function(res) {
         // is_joined(msg).then(set_p_n.bind(null, msg)).then(function(res) {
             if(!res) {
@@ -779,7 +798,7 @@ module.exports = function(bot/*, botad*/) {
                     // console.log(button);
                     // console.log("PASSED 3");
                     var type = sub_from(BUTTONS[button].label);
-                    console.log(type + " = " + msg.text);
+                    // console.log(type + " = " + msg.text);
                     if(type == msg.text) {
                         console.log("S3");
                         // return bot.event(BUTTONS[button].command, msg, props);
@@ -971,6 +990,27 @@ module.exports = function(bot/*, botad*/) {
         return new Promise(function(resolved, reject) {
             return resolved(true);
         });
+    }
+
+    function is_from_existed_buttons(text) {
+        return (text == '/start' || text == BUTTONS.became_member.command
+        || text == BUTTONS.main_menu.command || text == BUTTONS.telegram_channel.command
+        || text == BUTTONS.male_collection.command || text == BUTTONS.femele_collection.command
+        || text == BUTTONS.spouse_collection.command || text == BUTTONS.baby_collection.command
+        || text == BUTTONS.narriage_collection.command || text == BUTTONS.jewelry_collection.command
+        || text == BUTTONS.kafsh_collection.command || text == BUTTONS.accessory_collection.command
+        || text == BUTTONS.instagram_1.command || text == BUTTONS.instagram_2.command
+        || text == BUTTONS.instagram_3.command || text == BUTTONS.instagram_4.command
+        || text == BUTTONS.instagram_5.command || text == BUTTONS.instagram_6.command
+        || text == BUTTONS.instagram_7.command || text == BUTTONS.instagram_8.command
+        || text == BUTTONS.instagram_9.command || text == BUTTONS.instagram_10.command
+        || text == BUTTONS.instagram_page.command || text == BUTTONS.contact_us.command
+        || text == BUTTONS.return_back.command);
+        // {
+        //     return true;
+        // }
+
+        // return false;
     }
 
     function set_p_n(msg) {

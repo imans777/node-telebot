@@ -7,6 +7,7 @@ var schema = new Schema({
     first_name: String,
     last_name: String,
     username: String,
+    is_just_accepted: { type: Boolean, 'default': false },
     is_joined: Boolean,
     previous: String,
     next: String,
