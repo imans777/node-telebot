@@ -77,6 +77,10 @@ var BUTTONS = {
         label: 'testtemp3948threj',
         command: '/time_reservation'
     },
+    recruitment_request: {
+        label: 'درخواست استخدام',
+        command: '/recruitment_request'
+    },
 
     //------------------------------------ THIS IS FOR INSTAGRAM PAGES
     instagram_1: {

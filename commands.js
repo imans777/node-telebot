@@ -11,6 +11,7 @@ var Type = require('./schema/type');
 // var com_same = require('./commands_same');
 var Product = require('./schema/product');
 var Reservation = require('./schema/reservation');
+var Recruitment = require('./schema/recruitment');
 var Customer = require('./schema/customers');
 var Notif = require('./schema/notif');
 
@@ -434,6 +435,7 @@ module.exports = function(bot/*, botad*/) {
         // return bot.event(BUTTONS.main_menu.command, msg, props);
     });
 
+    //for time reservation
     bot.on('ask.gotten_day', function(msg, props) {
         if(msg.text == info.cancel) {
             return;
@@ -595,6 +597,163 @@ module.exports = function(bot/*, botad*/) {
         });
     });
 
+    //for recruitment request
+    bot.on('ask.rec_get_name', function(msg, props) {
+        if(msg.text == info.cancel) {
+            return;
+        }
+
+        r = new Recruitment({
+            name: msg.text,
+            user_id: msg.from.id
+        });
+        r.save(function(err) {
+            if(err) throw err;
+
+            bot.sendMessage(msg.from.id, messages.normal.choose_phone, {replyMarkup:
+                bot.keyboard([[bot.button('contact', 'ارسال شماره')], [info.cancel]], {resize: true})
+            });
+        })
+    });
+
+    bot.on('ask.rec_get_city', function(msg, props) {
+        if(msg.text == info.cancel)
+            return;
+
+        Recruitment.findOne({user_id: msg.from.id, form_completed: false}).exec(function(err, doc) {
+            if(err) throw err;
+            if(!doc) return error_get_back_to_main_menu(msg.from.id);
+
+            doc.city = msg.text;
+            doc.save(function(errs) {
+                if(errs) throw errs;
+                bot.sendMessage(msg.from.id, messages.normal.choose_married, {replyMarkup:
+                    bot.keyboard([['بله'], ['خیر'], [info.cancel]], {resize: true}), ask: 'rec_get_married'
+                });
+            })
+        })
+    });
+
+    bot.on('ask.rec_get_married', function(msg, props) {
+        if(msg.text == info.cancel)
+            return;
+
+        Recruitment.findOne({user_id: msg.from.id, form_completed: false}).exec(function(err, doc) {
+            if(err) throw err;
+            if(!doc) return error_get_back_to_main_menu(msg.from.id);
+
+            doc.is_married = (msg.text == 'بله');
+            doc.save(function(errs) {
+                if(errs) throw errs;
+                bot.sendMessage(msg.from.id, messages.normal.choose_wanting_salary, {replyMarkup:
+                    bot.keyboard([[info.cancel]], {resize: true}), ask: 'rec_get_wanting_salary'
+                });
+            });
+        })
+    });
+
+    bot.on('ask.rec_get_wanting_salary', function(msg, props) {
+        if(msg.text == info.cancel)
+            return;
+
+        Recruitment.findOne({user_id: msg.from.id, form_completed: false}).exec(function(err, doc) {
+            if(err) throw err;
+            if(!doc) return error_get_back_to_main_menu(msg.from.id);
+
+            doc.wanting_salary = msg.text;
+            doc.save(function(errs) {
+                if(errs) throw errs;
+                bot.sendMessage(msg.from.id, messages.normal.choose_fulltime, {replyMarkup:
+                    bot.keyboard([['بله'], ['خیر، به صورت پاره وقت'], [info.cancel]], {resize: true}), ask: 'rec_get_fulltime'
+                });
+            });
+        });
+    });
+
+    bot.on('ask.rec_get_fulltime', function(msg, props) {
+        if(msg.text == info.cancel)
+            return;
+
+        Recruitment.findOne({user_id: msg.from.id, form_completed: false}).exec(function(err, doc) {
+            if(err) throw err;
+            if(!doc) return error_get_back_to_main_menu(msg.from.id);
+
+            doc.is_fulltime = (msg.text == 'بله');
+            doc.save(function(errs) {
+                if(errs) throw errs;
+                bot.sendMessage(msg.from.id, messages.normal.choose_cv, {replyMarkup:
+                    bot.keyboard([[info.cancel]], {resize: true}),
+                });
+            });
+        });
+    });
+
+    bot.on('document', function(msg) {
+        // console.log("1", msg);
+        bot.getFile(msg.document.file_id).then(function(res) {
+            // console.log("2", res);
+            Recruitment.findOne({user_id: msg.from.id, form_completed: false}).then(function(doc) {
+                // console.log("3", doc);
+                if(!doc) return error_get_back_to_main_menu(msg.from.id);
+
+                // console.log("4");
+                let falsify = false;
+                //console log falsify thingis to find out the problem
+                // console.log("PROBLEM BOSS", res, res.file_size >= 20*1024*1024, typeof(res.file_size));
+                if(res.file_size >= 20 * 1024 * 1024)
+                    falsify = true;
+
+                // console.log("4.5");
+                let ext = res.file_path.split('/');
+                // console.log("EXT:", ext);
+                ext = ext[ext.length - 1];
+                ext = ext.split('.');
+                ext = ext[ext.length - 1];
+                if(!(ext == 'zip' || ext == 'rar' || ext == 'x-rar'))
+                    falsify = true;
+
+                if(falsify) {
+                    return bot.sendMessage(msg.from.id, messages.normal.file_size_exceed).then(function() {
+                        return bot.sendMessage(msg.from.id, messages.normal.choose_cv, {replyMarkup:
+                            bot.keyboard([[info.cancel]], {resize: true}),
+                        });
+                    });
+                }
+
+                // console.log("5");
+                doc.cv_extension = ext;
+                doc.cv_pointer = res.file_id;
+                doc.form_completed = true;
+                doc.save(function(errs) {
+                    if(errs) throw errs;
+
+                    // console.log("6");
+                    bot.sendMessage(msg.from.id, messages.normal.recruitment_end, {replyMarkup:
+                        bot.keyboard(replies.main_menu, {resize: true})
+                    });
+                })
+            });
+        })
+    });
+
+    // bot.on('ask.rec_getCV', function(msg, props) {
+    //     if(msg.text == info.cancel)
+    //         return;
+    //
+    //     Recruitment.findOne({user_id: msg.from.id, form_completed: false}).exec(function(err, doc) {
+    //         if(err) throw err;
+    //         if(!doc) return error_get_back_to_main_menu(msg.from.id);
+    //
+    //         doc.cv_pointer = ''; //should be somewhere
+    //         doc.save(function(errs) {
+    //             if(errs) throw errs;
+    //             bot.sendMessage(msg.from.id, messages.normal.reservation_set, {replyMarkup:
+    //                 bot.keyboard(replies.main_menu, {resize: true})
+    //             });
+    //         })
+    //     })
+    // });
+
     // Buttons
     // bot.on('/buttons', function(msg) {
     //
@@ -613,14 +772,13 @@ module.exports = function(bot/*, botad*/) {
                 return error_get_back_to_main_menu(msg.from.id);
             });
         }
+        // console.log("NOT THE ONE I WANTED");
         console.log(props);
         console.log(msg.contact);
-         Reservation.findOne({user_id: msg.from.id}).exec(function(err, doc) {
+        Reservation.findOne({user_id: msg.from.id, form_completed: false}).then(function(err, doc) {
             if (err) throw err;
 
-            if (!doc) {
-                return error_occurred(msg.from.id);
-            }
+            if (!doc) throw "NOT RESERVATION";
 
             doc.phone = msg.contact.phone_number;
             doc.form_completed = true;
@@ -631,7 +789,28 @@ module.exports = function(bot/*, botad*/) {
                     bot.keyboard(replies.main_menu, {resize: true})
                 });
             });
+        }).catch(function(err) {
+            if(err !== "NOT RESERVATION")
+                return error_occurred(msg.from.id);
+
+            Recruitment.findOne({user_id: msg.from.id, form_completed: false}).exec(function(errr, doc) {
+                if(errr) throw errr;
+
+                if(!doc)
+                    return error_occurred(msg.from.id);
+
+                doc.phone = msg.contact.phone_number;
+                doc.save(function(errs) {
+                    if(errs) throw errs;
+
+                    bot.sendMessage(msg.from.id, messages.normal.choose_city, {replyMarkup:
+                        bot.keyboard([[info.cancel]], {resize: true}), ask: 'rec_get_city'
+                    });
+                })
+            });
         });
+
+
     });
 
     // bot.on(info.cancel, function(msg) {
@@ -732,14 +911,14 @@ module.exports = function(bot/*, botad*/) {
 
             return;
         }
-        console.log("passed");
+        // console.log("passed");
 
         set_p_n(msg).then(is_joined_FIXED.bind(null, msg)).then(function(res) {
         // is_joined(msg).then(set_p_n.bind(null, msg)).then(function(res) {
             if(!res) {
                 return;
             }
-            console.log("S0");
+            // console.log("S0");
 
             if(msg.text == info.time_reservation) {
                 //check if a reservation with such user_id exists or not
@@ -759,14 +938,51 @@ module.exports = function(bot/*, botad*/) {
                     }
                 });
                 return;
-            } else if(msg.text == info.cancel) {
-                 Reservation.findOne({user_id: msg.from.id, accepted: false}).remove(function(err) {
+            } else if(msg.text == info.recruitment_request) {
+
+                Recruitment.findOne({user_id: msg.from.id, form_completed: false}).exec(function(err, doc) {
                     if(err) throw err;
-                     bot.sendMessage(msg.from.id, messages.normal.reservation_canceled).then(function() {
-                         error_get_back_to_main_menu(msg.from.id);
+
+                    if(doc) {
+                        //should delete the current and lead back to /main menu
+                        return doc.remove(function(errr) {
+                            if(errr) throw errr;
+                            error_get_back_to_main_menu(msg.from.id);
+                        });
+                    } else {
+                        bot.sendMessage(msg.from.id, messages.normal.choose_name, {replyMarkup:
+                            bot.keyboard([[info.cancel]], {resize: true}), ask: 'rec_get_name'
+                        });
+                    }
+                });
+                return;
+
+            } else if(msg.text == info.cancel) {
+                cb = function() {
+                    Recruitment.findOne({user_id: msg.from.id, form_completed: false}).exec(function(err, doc) {
+                        if(err) throw err;
+                        if(!doc) return error_get_back_to_main_menu(msg.from.id);
+
+                        doc.remove(function(errr) {
+                            if(errr) throw errr;
+                            bot.sendMessage(msg.from.id, messages.normal.reservation_canceled).then(function() {
+                                error_get_back_to_main_menu(msg.from.id);
+                            });
+                        });
+                    });
+                };
+                Reservation.findOne({user_id: msg.from.id, accepted: false}).exec(function(err, doc) {
+                    if(err) throw err;
+                    if(!doc) return cb();
+
+                    doc.remove(function(errr) {
+                        if(errr) throw errr;
+                        bot.sendMessage(msg.from.id, messages.normal.reservation_canceled).then(function() {
+                            error_get_back_to_main_menu(msg.from.id);
+                        });
                     });
                 });
-                 return;
+                return;
             }
         // var but = {
         //     label: 'This',

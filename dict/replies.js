@@ -34,6 +34,7 @@ module.exports = function(B) {
         main_menu: [
             [B.contact_us.label],
             [/*B.time_reservation.label*/info.time_reservation],
+            [info.recruitment_request],
             [B.femele_collection.label, B.male_collection.label],
             [B.baby_collection.label, B.spouse_collection.label],
             [B.jewelry_collection.label, B.narriage_collection.label],

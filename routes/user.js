@@ -5,16 +5,19 @@ var passport = require('passport');
 var formidable = require('formidable');
 var fs = require('fs');
 var async = require('async');
-
 // var Cart = require('../models/cart');
 // var Order = require('../models/order');
 var User = require('../models/user');
 var Type = require('../models/type');
 var Product = require('../models/product');
 var Reservation = require('../schema/reservation');
+var Recruitment = require('../schema/recruitment');
 var Customer = require('../schema/customers');
 var Notif = require('../schema/notif');
 // var gravatar = require('gravatar');
+
+let Telebot = require('telebot');
+let b = new Telebot(require('../dict/info').telegram_test_token);
 
 var csrfProtection = csrf();
 
@@ -203,6 +206,28 @@ router.get('/uploading_file/ajax_call/101/bitch', isLoggedIn, function (req, res
         res.end(percent_complete.toFixed(2));
         // return;
     });
+});
+
+router.get('/cvs/:file_id', isLoggedIn, function(req, res, next) {
+    b.getFile(req.params.file_id).then(function(file) {
+        // console.log("I've got something:", file);
+        // res.redirect(docs);
+        // res.download(file.fileLink);
+        // res.sendFile(file.fileLink, {root: ''});
+        res.redirect(302, file.fileLink);
+    }).catch(function(err) {
+        console.log("ERR:", err);
+    });
+});
+
+router.get('/cvs', isLoggedIn, function(req, res, next) {
+    Recruitment.find({form_completed: true}, function(err, docs) {
+        if(err) throw err;
+
+        res.render('cv', {
+            cvs: docs
+        });
+    })
 });
 
 router.post('/:gender/add', isLoggedIn, function(req, res, next) {
@@ -917,7 +942,11 @@ router.get('/collections', isLoggedIn, function(req, res, next) {
             res.render('collections', {
                 col: collections,
                 res: docs,
-                customers_count: c
+                customers_count: c,
+                cvs: {
+                    label: 'رزومه های ارسالی',
+                    command: '/cvs'
+                }
             });
         });
     });

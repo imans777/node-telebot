@@ -51,6 +51,7 @@ const info = {
     cancel: 'لغو درخواست',
 
     time_reservation: 'تعیین وقت شوروم',
+    recruitment_request: 'درخواست استخدام',
     short_break_between_in_hour: 1,
     delta_date_from_server: {
         hour: 0, //8,

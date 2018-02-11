@@ -5,16 +5,13 @@ mongoose.Promise = global.Promise;
 /*
 * Things that should be changed on server:
 * - here, telegram_test_token -> telegram_token
+* - user, telegram_test_token -> telegram_token
 * - info, change local date (hours and minutes) */
 
 var Telebot = require('telebot');
 var BUTTONS = require('./dict/buttons');
 var info = require('./dict/info');
-// var replies = require('./replies')(BUTTONS);
-var commands = require('./commands');
 // var commands_admin = require('./commands_admin');
-
-
 var bot = new Telebot({
     token: info.telegram_test_token,
     polling: {
@@ -28,6 +25,12 @@ var bot = new Telebot({
         }
     }
 });
+
+
+module.exports = {
+    bot
+};
+
 // const bot = new TeleBot({
 //     token: 'TELEGRAM_BOT_TOKEN', // Required. Telegram Bot API token.
 //     polling: { // Optional. Use polling.
@@ -54,8 +57,8 @@ var bot = new Telebot({
 //         // }
 //     }
 // });
-
 //FOR ADMIN CONTROL PANNEL BOT
+
 /*var newbot = new Telebot({
     token: info.telegram_admin_token,
     usePlugins: ['namedButtons', 'askUser'],
@@ -72,6 +75,8 @@ var bot = new Telebot({
 // commands_admin(newbot);
 // commands.HIDE(bot);
 // commands.START(bot, info);
+// var replies = require('./replies')(BUTTONS);
+var commands = require('./commands');
 commands(bot/*, newbot*/);
 bot.start();
 // newbot.start();

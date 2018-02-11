@@ -1,0 +1,45 @@
+<div class="row">
+    <div class="col-md-12 col-sm-12">
+        <div class="container">
+            <h1 class="bg-warning title-page">رزومه ها</h1>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="container">
+        <table class="table table-table-striped table-hover">
+            <thead>
+            <tr>
+                <th class="text-center">رزومه</th>
+                <th class="text-center">تمام وقت بودن</th>
+                <th class="text-center">حقوق درخواستی</th>
+                <th class="text-center">تاهل</th>
+                <th class="text-center">شهر</th>
+                <th class="text-center">شماره تلفن</th>
+                <th class="text-center">نام</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{#each cvs}}
+                <tr class="text-center">
+                    <td><a href="cvs/{{this.cv_pointer}}">دانلود رزومه ({{this.cv_extension}})</a></td>
+                    {{#if this.is_fulltime}}
+                        <td>تمام وقت</td>
+                    {{else}}
+                        <td>پاره وقت</td>
+                    {{/if}}
+                    <td>{{this.wanting_salary}}</td>
+                    {{#if this.is_married}}
+                        <td>متاهل</td>
+                    {{else}}
+                        <td>مجرد</td>
+                    {{/if}}
+                    <td>{{this.city}}</td>
+                    <td>{{this.phone}}</td>
+                    <td>{{this.name}}</td>
+                </tr>
+            {{/each}}
+            </tbody>
+        </table>
+    </div>
+</div>
