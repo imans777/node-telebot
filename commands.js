@@ -773,31 +773,34 @@ module.exports = function(bot/*, botad*/) {
             });
         }
         // console.log("NOT THE ONE I WANTED");
-        console.log(props);
-        console.log(msg.contact);
-        Reservation.findOne({user_id: msg.from.id, form_completed: false}).then(function(err, doc) {
-            if (err) throw err;
+        // console.log(props);
+        // console.log(msg.contact);
+        Reservation.findOne({user_id: msg.from.id, form_completed: false}).then(function(doc) {
+            // console.log("these are err and doc", doc);
 
             if (!doc) throw "NOT RESERVATION";
 
+            // console.log("see if we have the phone number or not", msg.contact.phone_number);
             doc.phone = msg.contact.phone_number;
             doc.form_completed = true;
             doc.save(function(errs) {
-                if(errs) throw errs;
+              // console.log("error of doc.save", errs);
+              if(errs) throw errs;
 
                  bot.sendMessage(msg.from.id, messages.normal.reservation_set, {replyMarkup:
                     bot.keyboard(replies.main_menu, {resize: true})
                 });
             });
         }).catch(function(err) {
+            // console.log("so we are in the catch part", err);
             if(err !== "NOT RESERVATION")
-                return error_occurred(msg.from.id);
+                return error_occurred(msg.from.id, err);
 
             Recruitment.findOne({user_id: msg.from.id, form_completed: false}).exec(function(errr, doc) {
                 if(errr) throw errr;
 
                 if(!doc)
-                    return error_occurred(msg.from.id);
+                    return error_occurred(msg.from.id, "no doc found for recruitment");
 
                 doc.phone = msg.contact.phone_number;
                 doc.save(function(errs) {
@@ -808,6 +811,8 @@ module.exports = function(bot/*, botad*/) {
                     });
                 })
             });
+        }).catch((err) => {
+            console.log("this is the error:", err);
         });
 
 
